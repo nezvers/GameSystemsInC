@@ -5,13 +5,13 @@
 
 class TileSet{
     private:
-        int         tiles;
-        int         collumns;
-        int         rows;
-        Rectangle   tile_rect;
+        int         collumns;   //Columns in texture
+        int         rows;       //Rows in texture
+        Rectangle   tile_rect;  //Used for drawing tiles
     public:
         Texture2D   texture;
         Vector2     tile_size;
+        int         tile_count;      //How many tiles there are
 
     TileSet         (const char *textureFileName, Vector2 TileSize);//Construct
     ~TileSet        ();//Destruct

@@ -10,41 +10,49 @@ TileMap::TileMap(TileSet& newTileSet, Vector2 mapPosition, int Columns, int Rows
     position = mapPosition;
     width = Columns;
     height = Rows;
-    tilemap = new int[width * height]{-1};
+    tilemap = new int[width * height];
+    std::fill(tilemap, tilemap+width*height, -1);
     update = true;
     texture = LoadRenderTexture((int)((float)width*cell_size.x), (int)((float)height*cell_size.y));
-
-
 }
 
 TileMap::~TileMap(){
     delete [] tilemap;
+    delete tileset;
     UnloadRenderTexture(texture);
 }
 
-void TileMap::SetMapSize(int left, int top, int right, int bottom){
-    position.x += float(left);
-    position.y += float(top);
-    int w = width -left +right;
-    int h = height -top +bottom;
+void TileMap::ResizeMap(int left, int top, int right, int bottom){ //resize by cell size
+    position.x += (float)left*cell_size.x;  //reposition horizontally
+    position.y += (float)top*cell_size.y;   //reposition vertically
+    int w = width -left +right;             //new width
+    int h = height -top +bottom;            //new height
 
-    int* tmp = tilemap;                                         //preparing for deleting old pointer
-    tilemap = new int[w * h]{-1};
+    /* *********************/
+    int* tmp = tilemap;                     //preparing for deleting old pointer
+    tilemap = new int[w * h];           //new TileMap grid populated with -1(empty) indexes
+    std::fill(tilemap, tilemap+w*h, -1);
 
-    //move old map to new
+    //move old map to new map grid
+    int tile_max = tileset->tile_count;
     for (int y = 0; y < width; ++y){
         for (int x = 0; x< height; ++x){
-            if (x+left >= 0 && y+top >= 0 && x+left < w && y+top < h){
-                tilemap[width*(y+top) + x+left] = tmp[width*y + x];
+
+            if (x-left >= 0 && y-top >= 0 && x-left < w && y-top < h){
+                tilemap[width*(y+top) + x+left] = tmp[width*y + x ];
+                std::cout << x+left << ' ' << y+top << ' ' << tmp[width*y + x ] << std::endl;
             }
         }
     }
-    width = w;
-    height = h;
-    delete [] tmp;                                              //remove old pointer
+    delete [] tmp;
+    tmp = NULL;                         //remove old array
+    /* *****************************/
+
+    width = w;                              //Save new width
+    height = h;                             //save new height
     UnloadRenderTexture(texture);
-    texture = LoadRenderTexture((int)((float)width*cell_size.x), (int)((float)height*cell_size.y));
-    update = true;                                              //set flag for render texture update
+    texture = LoadRenderTexture((int)((float)width*cell_size.x), (int)((float)height*cell_size.y)); //create new RenderTexture
+    update = true;                          //set flag for render texture update
 }
 
 int TileMap::GetTileId(Vector2 CellPosition){
@@ -93,7 +101,6 @@ void TileMap::Draw(){
     DrawTextureRec(texture.texture, (Rectangle){ 0.0f, 0.0f,
                    (float)texture.texture.width, (float)-texture.texture.height },
                    position, WHITE);
-
 }
 
 void TileMap::Update(){
@@ -133,7 +140,8 @@ void TileMap::DrawMapPart(Vector2 _pos, Vector2  _size){    //TO-DO
 
 void TileMap::Populate(){   //For Testing
     //test fill map
+    int tile_max = tileset->tile_count;
     for(int i=0; i<width*height; i++){
-        tilemap[i] = i;
+        tilemap[i] = i % tile_max;
     }
 }

@@ -8,7 +8,7 @@ class TileMap{
     public:
         TileMap(TileSet& newTileSet, Vector2 mapPosition, int Columns, int Rows);
         ~TileMap();
-        void SetMapSize(int left, int top, int right, int bottom);
+        void ResizeMap(int left, int top, int right, int bottom);
         void SetPosition(Vector2 _position);
         int GetTileId(Vector2 CellPosition);
         int GetTileIdWorld(Vector2 WorldPosition);

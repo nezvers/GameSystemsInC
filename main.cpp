@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "TileMap.h"
+#include <iostream>
 
 int main(void)
 {
@@ -17,6 +18,7 @@ int main(void)
     //Inside main
     TileSet myTiles("resources/TileSetter_template.png", {16.0f, 16.0f});
     TileMap myMap(myTiles, {64.0f, 64.0f}, 10, 5);
+    int time = 0;
     myMap.Populate();   //For testing purposes fill the map
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -29,7 +31,11 @@ int main(void)
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
         //----------------------------------------------------------------------------------
-
+        time++;
+        if (time == 60 * 2){
+            myMap.ResizeMap(-2,-2,+2,+2);
+            std::cout << "resized" << std::endl;
+        }
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
