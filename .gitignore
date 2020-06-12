@@ -1,0 +1,4 @@
+
+# Godot-specific ignores
+bin/
+obj/
