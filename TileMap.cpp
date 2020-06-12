@@ -27,7 +27,7 @@ void TileMap::ResizeMap(int left, int top, int right, int bottom){ //resize by c
     position.y += (float)top*cell_size.y;   //reposition vertically
     int w = width -left +right;             //new width
     int h = height -top +bottom;            //new height
-
+    //std::cout << "width: " << width << ' ' << height << ' ' << w << ' ' << h << std::endl;
     /* *********************/
     int* tmp = tilemap;                     //preparing for deleting old pointer
     tilemap = new int[w * h];           //new TileMap grid populated with -1(empty) indexes
@@ -35,12 +35,15 @@ void TileMap::ResizeMap(int left, int top, int right, int bottom){ //resize by c
 
     //move old map to new map grid
     int tile_max = tileset->tile_count;
-    for (int y = 0; y < width; ++y){
-        for (int x = 0; x< height; ++x){
+    for (int y = 0; y < height; y++){
+        if (y-top >= 0 && y-top < h){
 
-            if (x-left >= 0 && y-top >= 0 && x-left < w && y-top < h){
-                tilemap[width*(y+top) + x+left] = tmp[width*y + x ];
-                std::cout << x+left << ' ' << y+top << ' ' << tmp[width*y + x ] << std::endl;
+            for (int x = 0; x< width; x++){
+                    std::cout << x << ' ' << y << ' ' << tmp[width*y + x ] << std::endl;
+                if (x-left >= 0 &&  x-left < w){
+
+                    tilemap[w*(y-top) + x-left] = tmp[width*y + x ];
+                }
             }
         }
     }
