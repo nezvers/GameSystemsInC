@@ -1,4 +1,4 @@
 
-# Godot-specific ignores
+# compilation folders
 bin/
 obj/
