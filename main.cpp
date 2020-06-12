@@ -18,7 +18,7 @@ int main(void)
     //Inside main
     TileSet myTiles("resources/TileSetter_template.png", {16.0f, 16.0f});
     TileMap myMap(myTiles, {64.0f, 64.0f}, 10, 5);
-    int time = 0;
+    int index = 33;
     myMap.Populate();   //For testing purposes fill the map
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -28,8 +28,12 @@ int main(void)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) myMap.SetTileWorld(GetMousePosition(), index);
+        if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) myMap.SetTileWorld(GetMousePosition(), -1);
+        if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)){
+            int i = myMap.GetTileWorld(GetMousePosition());
+            index = i > -1 ? i : index;
+        }
         //----------------------------------------------------------------------------------
 
         // Draw

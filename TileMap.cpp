@@ -37,7 +37,6 @@ void TileMap::ResizeMap(int left, int top, int right, int bottom){ //resize by c
         if (y-top >= 0 && y-top < h){
 
             for (int x = 0; x< width; x++){
-                    std::cout << x << ' ' << y << ' ' << tmp[width*y + x ] << std::endl;
                 if (x-left >= 0 &&  x-left < w){
 
                     tilemap[w*(y-top) + x-left] = tmp[width*y + x ];
@@ -50,8 +49,6 @@ void TileMap::ResizeMap(int left, int top, int right, int bottom){ //resize by c
 
     width = w;                              //Save new width
     height = h;                             //save new height
-    UnloadRenderTexture(texture);
-    texture = LoadRenderTexture((int)((float)width*cell_size.x), (int)((float)height*cell_size.y)); //create new RenderTexture
     update = true;                          //set flag for render texture update
 }
 
@@ -70,13 +67,14 @@ void TileMap::SetTile(Vector2 CellPosition, int index){
     if (index < -1 || index > tileset->tile_count){ //Invalid index
         return;
     }
-
     int xp = (int)CellPosition.x;
     int yp = (int)CellPosition.y;
     bool xIn = xp >= 0 && xp < width;
     bool yIn = yp >= 0 && yp < height;
     if (xIn && yIn){
         tilemap[xp + yp * width] = index;
+        std::cout << xp << ' ' << yp << ' ' << tilemap[xp + yp * width] << std::endl;
+        update = true;
     }
     else if (index != -1){
         int left, top, right, bottom;
@@ -97,15 +95,13 @@ int TileMap::GetTileWorld(Vector2 WorldPosition){
     if (lessX || lessY || biggerX || biggerY){
         return -1;
     }
-    int x = (int)((WorldPosition.x - position.x)/width);
-    int y = (int)((WorldPosition.y - position.y)/height);
+    int x = floor((WorldPosition.x - position.x)/cell_size.x);
+    int y = floor((WorldPosition.y - position.y)/cell_size.y);
     return tilemap[width*y + x];
 }
 
 void TileMap::SetTileWorld(Vector2 WorldPosition, int index){
-    int xp = (int)(WorldPosition.x/cell_size.x);
-    int yp = (int)(WorldPosition.y/cell_size.y);
-    SetTile({(float)xp, (float)yp}, index);
+    SetTile(World2Tile(WorldPosition), index);
 }
 
 void TileMap::SetPosition(Vector2 _position){
@@ -113,15 +109,15 @@ void TileMap::SetPosition(Vector2 _position){
 }
 
 Vector2 TileMap::World2Tile(Vector2 _position){
-    int _x = (int)((_position.x - position.x)/cell_size.x); //cast to int for flooring the value
-    int _y = (int)((_position.y - position.y)/cell_size.y);
-    return Vector2{(float)_x, (float)_y};
+    float xp = floor((_position.x-position.x)/cell_size.x);
+    float yp = floor((_position.y-position.y)/cell_size.y);
+    return (Vector2){xp, yp};
 }
 
 Vector2 TileMap::Tile2World(Vector2 _position){
     float _x = _position.x * cell_size.x + position.x;
     float _y = _position.y * cell_size.y + position.y;
-    return Vector2{_x, _y};
+    return (Vector2){_x, _y};
 }
 
 void TileMap::Draw(){
@@ -137,7 +133,11 @@ void TileMap::Update(){
         return;
     }
 
+    UnloadRenderTexture(texture);
+    texture = LoadRenderTexture((int)((float)width*cell_size.x), (int)((float)height*cell_size.y)); //create new RenderTexture
+
     BeginTextureMode(texture);  //bypassed if without RT
+    std::cout << "UPDATE" << std::endl;
     DrawMapTiles();
     EndTextureMode();           //bypassed if without RT
 
