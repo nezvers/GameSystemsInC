@@ -10,8 +10,10 @@ class TileMap{
         ~TileMap();
         void ResizeMap(int left, int top, int right, int bottom);
         void SetPosition(Vector2 _position);
-        int GetTileId(Vector2 CellPosition);
-        int GetTileIdWorld(Vector2 WorldPosition);
+        int GetTile(Vector2 CellPosition);
+        void SetTile(Vector2 CellPosition, int index);
+        int GetTileWorld(Vector2 WorldPosition);
+        void SetTileWorld(Vector2 WorldPosition, int index);
         Vector2 World2Tile(Vector2 _position);
         Vector2 Tile2World(Vector2 _position);
         void Draw();
