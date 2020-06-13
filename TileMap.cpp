@@ -22,45 +22,34 @@ TileMap::~TileMap(){
     UnloadRenderTexture(texture);
 }
 
-void TileMap::ResizeMap(int left, int top, int right, int bottom){ //resize by cell size
-    position.x += (float)left*cell_size.x;  //reposition horizontally
-    position.y += (float)top*cell_size.y;   //reposition vertically
-    int w = width -left +right;             //new width
-    int h = height -top +bottom;            //new height
+void TileMap::Draw(){
+    Update();
 
-    int* tmp = tilemap;                     //preparing for deleting old pointer
-    tilemap = new int[w * h];           //new TileMap grid populated with -1(empty) indexes
-    std::fill(tilemap, tilemap+w*h, -1);
-
-    //move old map to new map grid
-    for (int y = 0; y < height; y++){
-        if (y-top >= 0 && y-top < h){
-
-            for (int x = 0; x< width; x++){
-                if (x-left >= 0 &&  x-left < w){
-
-                    tilemap[w*(y-top) + x-left] = tmp[width*y + x ];
-                }
-            }
-        }
-    }
-    delete [] tmp;
-    tmp = NULL;                         //remove old array
-
-    width = w;                              //Save new width
-    height = h;                             //save new height
-    update = true;                          //set flag for render texture update
+    DrawTextureRec(texture.texture, (Rectangle){ 0.0f, 0.0f,
+                   (float)texture.texture.width, (float)-texture.texture.height },
+                   position, WHITE);
 }
 
-void TileMap::TrimMap()
-{
-    int left = width-1;
-    int top = height-1;
-    int right = 0;
-    int bottom = 0;
-    for (int y=0; y<height; y++){
-        for (int x=0; x<width; x++){
+void TileMap::Update(){
+    if (!update){
+        return;
+    }
 
+    UnloadRenderTexture(texture);
+    texture = LoadRenderTexture((int)((float)width*cell_size.x), (int)((float)height*cell_size.y)); //create new RenderTexture
+
+    BeginTextureMode(texture);  //bypassed if without RT
+    std::cout << "UPDATE" << std::endl;
+    DrawMapTiles();
+    EndTextureMode();           //bypassed if without RT
+
+    update = false;             //bypassed if without RT
+}
+
+void TileMap::DrawMapTiles(){
+    for(int y=0; y<height; y++){
+        for(int x=0; x<width; x++){
+            tileset->draw_tile(tilemap[width*y + x], {x*cell_size.x, y*cell_size.y});
         }
     }
 }
@@ -87,8 +76,15 @@ void TileMap::SetTile(Vector2 CellPosition, int index){
     if (xIn && yIn){
         if (tilemap[xp + yp * width] != index){
             tilemap[xp + yp * width] = index;
-            std::cout << xp << ' ' << yp << ' ' << tilemap[xp + yp * width] << std::endl;
-            update = true;
+            if (index == -1){
+                if(!TrimMap()){
+                    update = true;
+                }
+            }
+            else{
+                update = true;
+            }
+            std::cout << "Set tile " << xp << ',' << yp << ' ' << tilemap[xp + yp * width] << std::endl;
         }
     }
     else if (index != -1){
@@ -125,6 +121,64 @@ void TileMap::SetPosition(Vector2 _position){
     position = _position;
 }
 
+void TileMap::ResizeMap(int left, int top, int right, int bottom){ //resize by cell size
+    position.x += (float)left*cell_size.x;  //reposition horizontally
+    position.y += (float)top*cell_size.y;   //reposition vertically
+    int w = width -left +right;             //new width
+    int h = height -top +bottom;            //new height
+
+    int* tmp = tilemap;                     //preparing for deleting old pointer
+    tilemap = new int[w * h];           //new TileMap grid populated with -1(empty) indexes
+    std::fill(tilemap, tilemap+w*h, -1);
+
+    //move old map to new map grid
+    for (int y = 0; y < height; y++){
+        if (y-top >= 0 && y-top < h){
+
+            for (int x = 0; x< width; x++){
+                if (x-left >= 0 &&  x-left < w){
+                    tilemap[w*(y-top) + x-left] = tmp[width*y + x ];
+                }
+            }
+        }
+    }
+    delete [] tmp;
+    tmp = NULL;                         //remove old array
+
+    width = w;                              //Save new width
+    height = h;                             //save new height
+    update = true;                          //set flag for render texture update
+}
+
+bool TileMap::TrimMap(){
+    int left = width-1;
+    int top = height-1;
+    int right = 0;
+    int bottom = 0;
+    for (int y=0; y<height; y++){
+        for (int x=0; x<width; x++){
+            if (tilemap[width*y + x] > -1){
+                if (x < left) left = x;
+                if (y < top) top = y;
+                if (x > right) right = x;
+                if (y > bottom) bottom = y;
+            }
+        }
+    }
+    left -= 0;
+    top -= 0;
+    right -= (width-1);
+    bottom -= (height-1);
+    if (left!=0 || top!=0 || right!=0 || bottom!=0){
+        ResizeMap(left,top,right,bottom);
+        std::cout << "Trimmed "<< left << ' ' << top << ' ' << right << ' ' << bottom << std::endl;
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
 Vector2 TileMap::World2Tile(Vector2 _position){
     float xp = floor((_position.x-position.x)/cell_size.x);
     float yp = floor((_position.y-position.y)/cell_size.y);
@@ -135,38 +189,6 @@ Vector2 TileMap::Tile2World(Vector2 _position){
     float _x = _position.x * cell_size.x + position.x;
     float _y = _position.y * cell_size.y + position.y;
     return (Vector2){_x, _y};
-}
-
-void TileMap::Draw(){
-    Update();
-
-    DrawTextureRec(texture.texture, (Rectangle){ 0.0f, 0.0f,
-                   (float)texture.texture.width, (float)-texture.texture.height },
-                   position, WHITE);
-}
-
-void TileMap::Update(){
-    if (!update){
-        return;
-    }
-
-    UnloadRenderTexture(texture);
-    texture = LoadRenderTexture((int)((float)width*cell_size.x), (int)((float)height*cell_size.y)); //create new RenderTexture
-
-    BeginTextureMode(texture);  //bypassed if without RT
-    std::cout << "UPDATE" << std::endl;
-    DrawMapTiles();
-    EndTextureMode();           //bypassed if without RT
-
-    update = false;             //bypassed if without RT
-}
-
-void TileMap::DrawMapTiles(){
-    for(int y=0; y<height; y++){
-        for(int x=0; x<width; x++){
-            tileset->draw_tile(tilemap[width*y + x], {x*cell_size.x, y*cell_size.y});
-        }
-    }
 }
 
 void TileMap::DrawMapPart(Vector2 _pos, Vector2  _size){    //TO_DO useful for frustrum culling

@@ -31,7 +31,7 @@ class TileMap{
         void DrawMapTiles();
         void DrawMapPart(Vector2 _pos, Vector2  _size);
         void ResizeMap(int left, int top, int right, int bottom);
-        void TrimMap();
+        bool TrimMap();
 };
 
 

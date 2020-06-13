@@ -33,6 +33,7 @@ int main(void)
         if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)){
             int i = myMap.GetTileWorld(GetMousePosition());
             index = i > -1 ? i : index;
+            std::cout << i << std::endl;;
         }
         //----------------------------------------------------------------------------------
 
