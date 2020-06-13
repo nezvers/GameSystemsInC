@@ -58,6 +58,11 @@ void TileMap::TrimMap()
     int top = height-1;
     int right = 0;
     int bottom = 0;
+    for (int y=0; y<height; y++){
+        for (int x=0; x<width; x++){
+
+        }
+    }
 }
 
 int TileMap::GetTile(Vector2 CellPosition){
