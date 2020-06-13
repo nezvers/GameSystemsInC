@@ -52,6 +52,14 @@ void TileMap::ResizeMap(int left, int top, int right, int bottom){ //resize by c
     update = true;                          //set flag for render texture update
 }
 
+void TileMap::TrimMap()
+{
+    int left = width-1;
+    int top = height-1;
+    int right = 0;
+    int bottom = 0;
+}
+
 int TileMap::GetTile(Vector2 CellPosition){
     bool lessX = CellPosition.x < 0.0f;
     bool lessY = CellPosition.y < 0.0f;
@@ -72,9 +80,11 @@ void TileMap::SetTile(Vector2 CellPosition, int index){
     bool xIn = xp >= 0 && xp < width;
     bool yIn = yp >= 0 && yp < height;
     if (xIn && yIn){
-        tilemap[xp + yp * width] = index;
-        std::cout << xp << ' ' << yp << ' ' << tilemap[xp + yp * width] << std::endl;
-        update = true;
+        if (tilemap[xp + yp * width] != index){
+            tilemap[xp + yp * width] = index;
+            std::cout << xp << ' ' << yp << ' ' << tilemap[xp + yp * width] << std::endl;
+            update = true;
+        }
     }
     else if (index != -1){
         int left, top, right, bottom;
@@ -83,6 +93,8 @@ void TileMap::SetTile(Vector2 CellPosition, int index){
         right = xp >= width ? xp - (width-1) : 0;
         bottom = yp >= height ? yp - (height-1) : 0;
         ResizeMap(left, top, right, bottom);
+        xp -= left;
+        yp -= top;
         tilemap[xp + yp * width] = index;
     }
 }

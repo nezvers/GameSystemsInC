@@ -8,7 +8,6 @@ class TileMap{
     public:
         TileMap(TileSet& newTileSet, Vector2 mapPosition, int Columns, int Rows);
         ~TileMap();
-        void ResizeMap(int left, int top, int right, int bottom);
         void SetPosition(Vector2 _position);
         int GetTile(Vector2 CellPosition);
         void SetTile(Vector2 CellPosition, int index);
@@ -26,10 +25,13 @@ class TileMap{
         int width;
         int height;
         Vector2 cell_size;
+
         bool update;                //Flag for render texture update
         void Update();              //Render texture update
         void DrawMapTiles();
         void DrawMapPart(Vector2 _pos, Vector2  _size);
+        void ResizeMap(int left, int top, int right, int bottom);
+        void TrimMap();
 };
 
 
