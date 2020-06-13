@@ -3,6 +3,7 @@ TileMap system for raylib
 
 ![](https://raw.githubusercontent.com/nezvers/TileMap/master/resources/TileMapSystem.gif)    
 
-Take a look into header files for comments.
-As it's still in last development steps there's still some 'std::cout' for double checking.
-Repository includes *.cbp which is Code::Blocks project file.
+Does not support animated tiles, that's out of project scope. But it would be appreciated on such contribution to the project.    
+Take a look into header files for comments.    
+As it's still in last development steps there's still some 'std::cout' for double checking.    
+Repository includes *.cbp which is Code::Blocks project file.    
