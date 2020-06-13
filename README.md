@@ -1,4 +1,5 @@
 # TileMap system for Raylib    
+But is easily portable to other C++ frameworks.    
 
 ![](https://raw.githubusercontent.com/nezvers/TileMap/master/resources/TileMapSystem.gif)    
 
