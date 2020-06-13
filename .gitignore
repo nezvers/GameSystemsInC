@@ -2,3 +2,4 @@
 # compilation folders
 bin/
 obj/
+*.depend
