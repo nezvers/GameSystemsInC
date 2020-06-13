@@ -1,5 +1,4 @@
-# TileMap_system_raylib
-TileMap system for raylib    
+# TileMap system for Raylib    
 
 ![](https://raw.githubusercontent.com/nezvers/TileMap/master/resources/TileMapSystem.gif)    
 
