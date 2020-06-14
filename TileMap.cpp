@@ -1,5 +1,4 @@
 #include "TileMap.h"
-#include "raylib.h"
 #include <cmath>
 #include <iostream>
 
@@ -19,7 +18,7 @@ TileMap::TileMap(TileSet& newTileSet, Vector2 mapPosition, int Columns, int Rows
 TileMap::~TileMap(){
     delete [] tilemap;
     delete tileset;
-    UnloadRenderTexture(texture);
+    UnloadRenderTexture(texture); //tutû
 }
 
 void TileMap::Draw(){
@@ -35,15 +34,15 @@ void TileMap::Update(){
         return;
     }
 
-    UnloadRenderTexture(texture);
-    texture = LoadRenderTexture((int)((float)width*cell_size.x), (int)((float)height*cell_size.y)); //create new RenderTexture
+    if (update_list.empty()){
+        UnloadRenderTexture(texture);
+        texture = LoadRenderTexture((int)((float)width*cell_size.x), (int)((float)height*cell_size.y)); //create new RenderTexture
 
-    BeginTextureMode(texture);  //bypassed if without RT
-    std::cout << "UPDATE" << std::endl;
-    DrawMapTiles();
-    EndTextureMode();           //bypassed if without RT
-
-    update = false;             //bypassed if without RT
+        BeginTextureMode(texture);
+        DrawMapTiles();
+        EndTextureMode();
+    }
+    update = false;
 }
 
 void TileMap::DrawMapTiles(){
@@ -83,8 +82,8 @@ void TileMap::SetTile(Vector2 CellPosition, int index){
             }
             else{
                 update = true;
+                //update_list.push_back(xp + yp * width);
             }
-            std::cout << "Set tile " << xp << ',' << yp << ' ' << tilemap[xp + yp * width] << std::endl;
         }
     }
     else if (index != -1){
@@ -97,6 +96,7 @@ void TileMap::SetTile(Vector2 CellPosition, int index){
         xp -= left;
         yp -= top;
         tilemap[xp + yp * width] = index;
+        //update_list.push_back(xp + yp * width);
     }
 }
 
