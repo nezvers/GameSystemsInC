@@ -42,6 +42,18 @@ void TileMap::Update(){
         DrawMapTiles();
         EndTextureMode();
     }
+    else{
+        BeginTextureMode(texture);
+        for(int i=0; i<(int)update_list.size(); i++){
+            int pos = update_list[i];
+            float x = (float)(pos % width);
+            float y = (float)floor(pos/width);
+            int index = tilemap[pos];
+            tileset->draw_tile(index, {x*cell_size.x, y*cell_size.y});
+        }
+        EndTextureMode();
+        update_list.erase(update_list.begin());
+    }
     update = false;
 }
 
@@ -82,7 +94,7 @@ void TileMap::SetTile(Vector2 CellPosition, int index){
             }
             else{
                 update = true;
-                //update_list.push_back(xp + yp * width);
+                update_list.push_back(xp + yp * width);
             }
         }
     }
