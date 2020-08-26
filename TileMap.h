@@ -3,7 +3,6 @@
 #define TILEMAP_H_INCLUDED
 #include "raylib.h"
 #include "TileSet.h"
-#include "vec2.h"
 #include <vector>
 
 struct vec2;
@@ -38,7 +37,6 @@ class TileMap{
         void                ResizeMap(int left, int top, int right, int bottom);                //resize map cells from border cells
         bool                TrimMap();                                                          //method to trim unused collumns and rows. Returns true if trimming happened
         void                DrawMapPart(Vector2 _pos, Vector2  _size);                          //TO-DO maybe
-        vec2 i = vec2(0.0,0.0);
 };
 
 
