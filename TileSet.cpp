@@ -7,8 +7,8 @@ TileSet::TileSet(const char *textureFileName, Vector2 TileSize){
     tile_size       = TileSize;                                             //int
     collumns        = texture.width/int(tile_size.x);                       //int
     rows            = texture.height/int(tile_size.y);                      //int
-    tile_count      = texture.width/collumns * texture.height/rows;         //int
-    tile_rect       = {0.0f, 0.0f, tile_size.x, tile_size.y};    //Rectangle
+    tile_count      = collumns * rows;                                      //int
+    tile_rect       = {0.0f, 0.0f, tile_size.x, tile_size.y};               //Rectangle
 }
 
 TileSet::~TileSet(){
