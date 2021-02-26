@@ -18,7 +18,7 @@ TileMap::TileMap(TileSet& newTileSet, Vector2 mapPosition, int Columns, int Rows
 TileMap::~TileMap(){
     delete [] tilemap;
     delete tileset;
-    UnloadRenderTexture(texture); //tutû
+    UnloadRenderTexture(texture); //tutÃ»
 }
 
 void TileMap::Draw(){
@@ -77,7 +77,7 @@ int TileMap::GetTile(Vector2 CellPosition){
 }
 
 void TileMap::SetTile(Vector2 CellPosition, int index){
-    if (index < -1 || index > tileset->tile_count){ //Invalid index
+    if (index < -1 || index >= tileset->tile_count){ //Invalid index
         return;
     }
     int xp = (int)CellPosition.x;
