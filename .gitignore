@@ -1,6 +1,3 @@
-
-# compilation folders
-bin/
-obj/
-*.depend
-*.layout
+*/*.exe
+*/*.o
+*/*.a

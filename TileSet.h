@@ -1,22 +1,109 @@
-#ifndef TILESET_H_INCLUDED
-#define TILESET_H_INCLUDED
+/*
+#define NEZ_TILESET_IMPLEMENTATION to include .c implementation
+*/
+
+#ifndef  NEZ_TILESET_H
+#define NEZ_TILESET_H
+
 #include "raylib.h"
 
 
-class TileSet{
-    private:
-        int             collumns;                                           //Columns in texture
-        int             rows;                                               //Rows in texture
-        Rectangle       tile_rect;                                          //Used for drawing tiles
-        Texture2D       texture;                                            //TileSet image
-    public:
-        Vector2         tile_size;                                          //Size of single tile
-        int             tile_count;                                         //How many tiles there are
-
-        TileSet         (const char *textureFileName, Vector2 TileSize);    //Construct
-        ~TileSet        ();                                                 //Destruct
-        void draw_tile  (int tileID, Vector2 position);                     //Method for draw event
-};
+typedef struct{
+    Texture2D texture;
+    int tileX;
+    int tileY;
+    int collumns;
+    int rows;
+    int tileCount;
+}TileSet;
 
 
-#endif // TILESET_H_INCLUDED
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef NEZTSAPI
+    #ifdef NEZ_TILESET_STATIC
+        #define NEZTSAPI static
+    #else
+        #define NEZTSAPI extern
+    #endif
+#endif
+
+NEZTSAPI TileSet*
+TileSetNew();                                                           // Allocates memory and give pointer to it
+NEZTSAPI TileSet*
+TileSetNewInitFromFile(const char * fileName, int tileWidth, int tileHeight); // Allocates memory, gives pointer to it and initializes sizes
+NEZTSAPI TileSet*
+TileSetNewInitFromMemory(Texture texture, int tileWidth, int tileHeight);// Allocates memory, gives pointer to it and initializes sizes
+NEZTSAPI void
+TileSetDestroy(TileSet* tileSet);                                       // Free allocated memory
+NEZTSAPI void
+TileSetDestroyWithTexture(TileSet* tileSet);                            // Free allocated memory and unloads texture
+NEZTSAPI void
+TileSetSetSize(TileSet *tileSet, int tileWidth, int tileHeight);        // Set tile size and tile IDs (Texture must be assigned)
+NEZTSAPI void
+TileSetDrawTile(TileSet *tileSet, int id, int x, int y);                // Draws tile at given position
+
+#ifdef __cplusplus
+}
+#endif
+#endif //NEZ_TILESET_H
+
+#ifdef NEZ_TILESET_IMPLEMENTATION
+#undef NEZ_TILESET_IMPLEMENTATION
+
+TileSet*    TileSetNew(){
+    TileSet *tileSet = MemAlloc(sizeof(TileSet));
+    return tileSet;
+}
+
+TileSet* TileSetNewInitFromFile(const char * fileName, int tileWidth, int tileHeight){
+    TileSet *tileSet = TileSetNew();
+    tileSet->texture = LoadTexture(fileName);
+    TileSetSetSize(tileSet, tileWidth, tileHeight);
+    return tileSet;
+}
+
+TileSet* TileSetNewInitFromMemory(Texture texture, int tileWidth, int tileHeight){
+    TileSet *tileSet = TileSetNew();
+    tileSet->texture = texture;
+    TileSetSetSize(tileSet, tileWidth, tileHeight);
+    return tileSet;
+}
+
+void TileSetDestroy(TileSet* tileSet){
+    MemFree(tileSet);
+}
+
+void TileSetDestroyWithTexture(TileSet* tileSet){
+    UnloadTexture(tileSet->texture);
+    TileSetDestroy(tileSet);
+}
+
+// texture must be assigned
+void TileSetSetSize(TileSet *tileSet, int tileWidth, int tileHeight){
+    tileSet->tileX = tileWidth;
+    tileSet->tileY = tileHeight;
+    tileSet->collumns = tileSet->texture.width/tileWidth;
+    tileSet->rows = tileSet->texture.height/tileHeight;
+    tileSet->tileCount = tileSet->collumns * tileSet->rows;
+}
+
+void TileSetDrawTile(TileSet *tileSet, int id, int x, int y){
+    int col = id % tileSet->collumns;
+    int row = id / tileSet->collumns;
+    Rectangle tileRect = {(float)col * tileSet->tileX, (float)row * tileSet->tileY, (float)tileSet->tileX, (float)tileSet->tileY};
+    DrawTextureRec(tileSet->texture, tileRect, (Vector2){(float)x, (float)y}, WHITE);
+}
+
+#endif //NEZ_TILESET_IMPLEMENTATION
+
+
+
+
+
+
+
+
+
