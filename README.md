@@ -13,13 +13,13 @@ Built to be as independent system as possible, but for rendering texture and mem
 If using different framework only need to change:    
 tileset.h    
 - TileSetDraw()
-- TileSetNew()
-- TileSetDestroy()
+- MemAlloc()
+- MemFree()
 
 tilemap.h
 - TileMapDrawGrid()
-- TileMapNew() 
-- TileMapDestroy()
+- MemAlloc()
+- MemFree()
 
 Example code used Raylib.
 
