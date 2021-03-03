@@ -12,7 +12,7 @@ To implement .c parts need to `#define` IMPLEMENTATION guard flags before `#incl
 Built to be as independent system as possible, but for rendering texture and memory allocation I used the Raylib framework.
 If using different framework only need to change:    
 tileset.h    
-- TileSetDraw()
+- TileSetDrawTile()
 - MemAlloc()
 - MemFree()
 
