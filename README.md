@@ -9,8 +9,18 @@ To implement .c parts need to `#define` IMPLEMENTATION guard flags before `#incl
 #include "../tileset.h"
 ```
 
-Built to be as independent system as possible, but for rendering texture and feature (TileMap grid) I choose a Raylib framework.
-If using different framework only need to change tileset.h function TileSetDraw and tilemap.h function TileMapDrawGrid.
-For example code is used Raylib.
+Built to be as independent system as possible, but for rendering texture and memory allocation I used the Raylib framework.
+If using different framework only need to change:    
+tileset.h    
+- TileSetDraw()
+- TileSetNew()
+- TileSetDestroy()
+
+tilemap.h
+- TileMapDrawGrid()
+- TileMapNew() 
+- TileMapDestroy()
+
+Example code used Raylib.
 
 Future plan is to make also an autotiling header.
