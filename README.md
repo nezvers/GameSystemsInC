@@ -3,9 +3,9 @@
 ##Very early build and heavy work in progress. High probability of bugs.
 
 `TileMapDrawExWorld(TileMap *tileMap, int x, int y, int width, int height)`    
-![](https://github.com/nezvers/TileMap/raw/master/Resource/Preview.gif)
+![](https://github.com/nezvers/TileMap/raw/master/Resource/Preview.gif)    
 `void AutoTileSetCell(AutoTile *autoTile, int x, int y)`    
-![](https://github.com/nezvers/TileMap/raw/master/Resource/Preview_autotile.gif)    
+![](https://github.com/nezvers/TileMap/raw/master/Resource/Preview_autotile.gif)     
 Header only libraries with separate elements - tileset.h, tilemap.h.
 To implement .c parts need to `#define` IMPLEMENTATION guard flags before `#include` of the header file:    
 ```
