@@ -48,6 +48,8 @@ AutoTileGetBitmask(AutoTile *autoTile, int x, int y);
 NEZATAPI void
 AutoTileSetCell(AutoTile *autoTile, int x, int y);
 NEZATAPI void
+AutoTileRemoveCell(AutoTile *autoTile, int x, int y);
+NEZATAPI void
 AutoTileUpdateCell(AutoTile *autoTile, int x, int y);
 NEZATAPI int
 GetSetBitCount(int n);
@@ -113,7 +115,6 @@ void AutoTileSetLookup(AutoTile *autoTile){
             if (bitmask > -1 && !(negativeMask & bitmask)){
                 int bits = GetSetBitCount(bitmask & i);
                 if (bits > maxBits){
-                    printf("i:%d, bitmask: %d, neg: %d, pass: %d\n", i, bitmask, negativeMask, (int)!(negativeMask & bitmask));
                     maxBits = bits;
                     id = j;
                 }
@@ -125,8 +126,6 @@ void AutoTileSetLookup(AutoTile *autoTile){
 
 // -1 if empty
 int AutoTileGetBitmask(AutoTile *autoTile, int x, int y){
-    int id = TileMapGetTile(autoTile->tileMap, x, y);
-    if (id == -1){ return -1; }
     int bitmask = 0;
     
     // scan tiles around and set coresponding bits
@@ -139,6 +138,10 @@ int AutoTileGetBitmask(AutoTile *autoTile, int x, int y){
     bitmask += (int)(TileMapGetTile(autoTile->tileMap, x,   y+1) > -1) << 6;
     bitmask += (int)(TileMapGetTile(autoTile->tileMap, x+1, y+1) > -1) << 7;
     
+    if (bitmask == 0){
+        int id = TileMapGetTile(autoTile->tileMap, x, y);
+        if (id == -1){ return -1; }
+    }
     return bitmask;
 }
 
@@ -159,12 +162,27 @@ void AutoTileSetCell(AutoTile *autoTile, int x, int y){
     AutoTileUpdateCell(autoTile, x+1, y+1);
 }
 
+void AutoTileRemoveCell(AutoTile *autoTile, int x, int y){
+    TileMapSetTile(autoTile->tileMap, x, y, -1);
+    
+    // update cells around
+    AutoTileUpdateCell(autoTile, x-1, y-1);
+    AutoTileUpdateCell(autoTile, x,   y-1);
+    AutoTileUpdateCell(autoTile, x+1, y-1);
+    AutoTileUpdateCell(autoTile, x-1, y);
+    AutoTileUpdateCell(autoTile, x+1, y);
+    AutoTileUpdateCell(autoTile, x-1, y+1);
+    AutoTileUpdateCell(autoTile, x,   y+1);
+    AutoTileUpdateCell(autoTile, x+1, y+1);
+}
+
 void AutoTileUpdateCell(AutoTile *autoTile, int x, int y){
+    int id = TileMapGetTile(autoTile->tileMap, x, y);
+    if (id < 0){return;}
+    
     int bitmask = AutoTileGetBitmask(autoTile, x, y);
-    if (bitmask == -1){
-        return;
-    }
-    int id = autoTile->lookup[ bitmask ];
+    
+    id = autoTile->lookup[ bitmask ];
     TileMapSetTile(autoTile->tileMap, x, y, id);
 }
 

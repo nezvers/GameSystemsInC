@@ -5,8 +5,10 @@
 #ifndef  NEZ_TILEMAP_H
 #define NEZ_TILEMAP_H
 
+
 #include "raylib.h"
 #include "tileset.h"
+#include "stdio.h"
 
 typedef struct{
     int* grid;
@@ -108,8 +110,8 @@ void TileMapSetGridData(TileMap *tileMap, int *data, int dataSize){
 int TileMapGetTile(TileMap *tileMap, int x, int y){
     bool lessX = x < 0;
     bool lessY = y < 0;
-    bool biggerX = x > tileMap->width;
-    bool biggerY = y > tileMap->height;
+    bool biggerX = x > tileMap->width-1;
+    bool biggerY = y > tileMap->height-1;
     if (lessX || lessY || biggerX || biggerY){
         return -1;
     }
@@ -131,30 +133,31 @@ int TileMapGetTileWorld(TileMap *tileMap, int x, int y){
 }
 
 void TileMapSetTile(TileMap *tileMap, int x, int y, int id){
-    if (id < -1 || id >= tileMap->tileSet->tileCount){
+    if (id < -1 || id > tileMap->tileSet->tileCount -1){
         return;
     }
-    bool xIn = x >= 0 && x < tileMap->width;
-    bool yIn = y >= 0 && y < tileMap->height;
+    bool xIn = x > -1 && x < tileMap->width;
+    bool yIn = y > -1 && y < tileMap->height;
     // sets tile within existing size
     if (xIn && yIn){
         int pos = x + y*tileMap->width;
         tileMap->grid[pos] = id;
         if (id == -1){
-            TileMapTrim(tileMap);
+            //TileMapTrim(tileMap);
         }
     }
-    else if (id != -1){
-        int left, top, right, bottom;
-        left = x < 0 ? x : 0;
-        top = y < 0 ? y : 0;
-        right = x >= tileMap->width ? x - (tileMap->width-1) : 0;
-        bottom = y >= tileMap->height ? y - (tileMap->height-1) : 0;
-        TileMapResize(tileMap, left, top, right, bottom);
-        x -= left;
-        y -= top;
-        tileMap->grid[x + y*tileMap->width] = id;
-    }
+    //RESIZE
+    // else if (id != -1){
+        // int left, top, right, bottom;
+        // left = x < 0 ? x : 0;
+        // top = y < 0 ? y : 0;
+        // right = x >= tileMap->width ? x - (tileMap->width-1) : 0;
+        // bottom = y >= tileMap->height ? y - (tileMap->height-1) : 0;
+        // TileMapResize(tileMap, left, top, right, bottom);
+        // x -= left;
+        // y -= top;
+        // tileMap->grid[x + y*tileMap->width] = id;
+    // }
 }
 
 void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom){

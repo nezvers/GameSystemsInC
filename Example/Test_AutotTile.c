@@ -93,11 +93,17 @@ void DefaultScreen(){
 
 
 void Inputs(){
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
         Vector2 mouse = GetMousePosition();
         int x = (int)mouse.x / tileSet->tileX;
         int y = (int)mouse.y / tileSet->tileY;
         AutoTileSetCell(autoTile, x, y);
+    }
+    if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)){
+        Vector2 mouse = GetMousePosition();
+        int x = (int)mouse.x / tileSet->tileX;
+        int y = (int)mouse.y / tileSet->tileY;
+        AutoTileRemoveCell(autoTile, x, y);
     }
 }
 
