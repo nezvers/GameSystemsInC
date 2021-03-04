@@ -11,8 +11,6 @@
 
 
 #include "raylib.h"
-#define NEZ_AUTOTILE_IMPLEMENTATION
-#include "../autotile.h"
 #define NEZ_TILEMAP_IMPLEMENTATION
 #include "../tilemap.h"
 #define NEZ_TILESET_IMPLEMENTATION
