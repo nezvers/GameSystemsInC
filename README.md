@@ -1,5 +1,7 @@
 # TileMap system in C [Raylib rendering]
 
+Very early build and heavy work in progress. High probability of bugs.
+
 ![](https://github.com/nezvers/TileMap/raw/master/Resource/Preview.gif)
 
 Header only libraries with separate elements - tileset.h, tilemap.h.
