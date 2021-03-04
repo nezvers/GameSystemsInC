@@ -1,5 +1,8 @@
 /*
 #define NEZ_AUTOTILE_IMPLEMENTATION to include .c implementation
+
+ DOESN'T WORK YET
+
 */
 
 #ifndef  NEZ_AUTOTILE_H
@@ -50,6 +53,8 @@ NEZATAPI void
 AutoTileSetCell(AutoTile *autoTile, int x, int y, int id);
 NEZATAPI void
 AutoTileUpdateCell(AutoTile *autoTile, int x, int y);
+NEZATAPI int
+GetSetBitCount(int n);
 
 #ifdef __cplusplus
 }
@@ -96,10 +101,33 @@ void AutoTileSetBitmask(AutoTile *autoTile, int *data, int dataSize){
 }
 
 void AutoTileSetLookup(AutoTile *autoTile){
-    for(int i = 0; i < autoTile->tileSet->tileCount; i++){
+    int tileCount = autoTile->tileSet->tileCount;
+    
+    // find tile ID with most bits in each position
+    for(int i = 1; i < 256; i++){
+        int maxBits = 0;
+        int mask = 0;
+        for(int j = 1; j < tileCount; j++){
+            int bitmask = autoTile->bitmask[i];
+            if (bitmask > -1){
+                int bits = GetSetBitCount(bitmask & i);
+                if (bits > maxBits){
+                    maxBits = bits;
+                    mask = bitmask;
+                }
+            }
+        }
+        autoTile->lookup[ i ] = mask;
+    }
+    
+    // find the center tile ID with bitmask of 0
+    for(int j = 1; j < tileCount; j++){
         int bitmask = autoTile->bitmask[i];
         if (bitmask > -1){
-            autoTile->lookup[ bitmask ] = i;
+            int bits = GetSetBitCount(bitmask);
+            if (bits == 0){
+                autoTile->lookup[ 0 ] = bitmask;
+            }
         }
     }
 }
@@ -147,13 +175,13 @@ void AutoTileUpdateCell(AutoTile *autoTile, int x, int y){
     TileMapSetTile(autoTile->tileMap, x, y, id);
 }
 
-
+int GetSetBitCount(int n){
+    int count = 0;
+    while (n) {
+        n &= (n - 1);
+        count++;
+    }
+    return count;
+}
 
 #endif //NEZ_AUTOTILE_IMPLEMENTATION
-
-
-
-
-
-
-
