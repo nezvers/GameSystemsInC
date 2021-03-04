@@ -89,7 +89,7 @@ void DefaultScreen(){
     //----------------------------------------------------------------------------------
     BeginDrawing();
     ClearBackground(RAYWHITE);
-        TileMapDrawGrid(tileMap);
+        TileMapDrawGrid(tileMap, BLACK);
         // only draw tiles that camera can see
         TileMapDrawExWorld(tileMap, (int)cam.x, (int)cam.y, cam.w, cam.h);
         DrawRectangleLines(cam.x, cam.y, cam.w, cam.h, LIGHTGRAY);

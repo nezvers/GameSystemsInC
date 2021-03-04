@@ -85,7 +85,7 @@ void DefaultScreen(){
     //----------------------------------------------------------------------------------
     BeginDrawing();
     ClearBackground(RAYWHITE);
-        TileMapDrawGrid(tileMap);
+        TileMapDrawGrid(tileMap, BLACK);
         TileMapDraw(tileMap);
         //TileMapDrawExWorld(tileMap, 0, 0, 20, 10);
     EndDrawing();

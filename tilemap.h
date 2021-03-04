@@ -71,7 +71,7 @@ TileMapDrawExWorld(TileMap *tileMap, int x, int y, int width, int height);      
 NEZTMAPI void 
 TileMapDrawPart(TileMap *tileMap, int posX, int posY, int x, int y, int width, int height); // Draw part of TileMap ignoring TIleMap position
 NEZTMAPI void 
-TileMapDrawGrid(TileMap *tileMap);
+TileMapDrawGrid(TileMap *tileMap, Color color);
 
 #ifdef __cplusplus
 }
@@ -244,7 +244,7 @@ void TileMapDraw(TileMap *tileMap){
     }
 }
 
-void TileMapDrawGrid(TileMap *tileMap){
+void TileMapDrawGrid(TileMap *tileMap, Color color){
     int x = tileMap->x;
     int y = tileMap->y;
     int w = tileMap->width;
@@ -253,14 +253,13 @@ void TileMapDrawGrid(TileMap *tileMap){
     int sy = tileMap->tileSet->tileY;
     int lenX = w*sx;
     int lenY = h*sy;
-    Color c = BLACK;
     // horizontal lines
     for (int i = 0; i < h+1; i++){
-        DrawLine(x, y + sy*i, x+lenX, y + sy*i, c);
+        DrawLine(x, y + sy*i, x+lenX, y + sy*i, color);
     }
     // vertical lines
     for (int i = 0; i < w+1; i++){
-        DrawLine(x + sx*i, y, x + sx*i, y+lenY, c);
+        DrawLine(x + sx*i, y, x + sx*i, y+lenY, color);
     }
 }
 
