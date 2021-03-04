@@ -1,7 +1,6 @@
 /*
 #define NEZ_AUTOTILE_IMPLEMENTATION to include .c implementation
 
- DOESN'T WORK YET
 
 */
 
@@ -98,6 +97,7 @@ void AutoTileSetBitmask(AutoTile *autoTile, int *data, int dataSize){
     for (int i =0; i < it; i++){
         autoTile->bitmask[i] = (BMASK)data[i];
     }
+    AutoTileSetLookup(autoTile);
 }
 
 void AutoTileSetLookup(AutoTile *autoTile){
@@ -107,9 +107,12 @@ void AutoTileSetLookup(AutoTile *autoTile){
     for(int i = 1; i < 256; i++){
         int maxBits = 0;
         int mask = 0;
+        int negativeMask = i ^ 0xFF;
         for(int j = 1; j < tileCount; j++){
             int bitmask = autoTile->bitmask[i];
-            if (bitmask > -1){
+            
+            // accept only if doesn't have bits that "i" doesn't have
+            if (bitmask > -1 && !(negativeMask & bitmask)){
                 int bits = GetSetBitCount(bitmask & i);
                 if (bits > maxBits){
                     maxBits = bits;
@@ -126,7 +129,7 @@ void AutoTileSetLookup(AutoTile *autoTile){
         if (bitmask > -1){
             int bits = GetSetBitCount(bitmask);
             if (bits == 0){
-                autoTile->lookup[ 0 ] = bitmask;
+                autoTile->lookup[ 0 ] = j;
             }
         }
     }
