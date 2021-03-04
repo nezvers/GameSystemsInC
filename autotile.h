@@ -1,7 +1,6 @@
 /*
 #define NEZ_AUTOTILE_IMPLEMENTATION to include .c implementation
 
-
 */
 
 #ifndef  NEZ_AUTOTILE_H
@@ -125,7 +124,7 @@ void AutoTileSetLookup(AutoTile *autoTile){
     
     // find the center tile ID with bitmask of 0
     for(int j = 1; j < tileCount; j++){
-        int bitmask = autoTile->bitmask[i];
+        int bitmask = autoTile->bitmask[j];
         if (bitmask > -1){
             int bits = GetSetBitCount(bitmask);
             if (bits == 0){
@@ -188,3 +187,6 @@ int GetSetBitCount(int n){
 }
 
 #endif //NEZ_AUTOTILE_IMPLEMENTATION
+
+
+
