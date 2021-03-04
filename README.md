@@ -1,6 +1,6 @@
 # TileMap system in C [Raylib rendering]
 
-##Very early build and heavy work in progress. High probability of bugs.
+## Very early build and heavy work in progress. High probability of bugs.
 
 `TileMapDrawExWorld(TileMap *tileMap, int x, int y, int width, int height)`    
 ![](https://github.com/nezvers/TileMap/raw/master/Resource/Preview.gif)    
