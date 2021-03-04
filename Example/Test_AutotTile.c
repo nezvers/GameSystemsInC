@@ -68,7 +68,7 @@ void InitGame(void){
     tileMap->tileSet = tileSet;
     TileMapInitSize(tileMap, 20, 10);
     autoTile = AutoTileNewInit(tileMap);
-    //AutoTileSetBitmaskData(autoTile, (int*)&bitmaskData, sizeof(bitmaskData));
+    AutoTileSetBitmaskData(autoTile, (int*)&bitmaskData, sizeof(bitmaskData));
     
 	Screen = DefaultScreen;
 }
