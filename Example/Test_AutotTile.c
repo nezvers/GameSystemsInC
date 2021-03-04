@@ -105,6 +105,18 @@ void Inputs(){
         int y = (int)mouse.y / tileSet->tileY;
         AutoTileRemoveCell(autoTile, x, y);
     }
+    if(IsKeyPressed(KEY_RIGHT)){
+        TileMapResize(tileMap, 0, 0, +1, 0);
+    }
+    else if(IsKeyPressed(KEY_LEFT)){
+        TileMapResize(tileMap, 0, 0, -1, 0);
+    }
+    else if(IsKeyPressed(KEY_DOWN)){
+        TileMapResize(tileMap, 0, 0, 0, +1);
+    }
+    else if(IsKeyPressed(KEY_UP)){
+        TileMapResize(tileMap, 0, 0, 0, -1);
+    }
 }
 
 

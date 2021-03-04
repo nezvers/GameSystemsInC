@@ -62,6 +62,8 @@ NEZTMAPI TilePosition
 TileMapTile2World(TileMap *tileMap, int x, int y);                                          // Convert tile coordinates to world coordinates
 NEZTMAPI void 
 TileMapClearGrid(TileMap *tileMap);                                                         // Remove all tile IDs (sets to -1)
+NEZTMAPI void
+TileMapClearGridEx(TileMap *tileMap, int x, int y, int w, int h);
 NEZTMAPI void 
 TileMapDraw(TileMap *tileMap);                                                              // Draw entire TileMap
 NEZTMAPI void 
@@ -143,21 +145,21 @@ void TileMapSetTile(TileMap *tileMap, int x, int y, int id){
         int pos = x + y*tileMap->width;
         tileMap->grid[pos] = id;
         if (id == -1){
-            //TileMapTrim(tileMap);
+            TileMapTrim(tileMap);
         }
     }
     //RESIZE
-    // else if (id != -1){
-        // int left, top, right, bottom;
-        // left = x < 0 ? x : 0;
-        // top = y < 0 ? y : 0;
-        // right = x >= tileMap->width ? x - (tileMap->width-1) : 0;
-        // bottom = y >= tileMap->height ? y - (tileMap->height-1) : 0;
-        // TileMapResize(tileMap, left, top, right, bottom);
-        // x -= left;
-        // y -= top;
-        // tileMap->grid[x + y*tileMap->width] = id;
-    // }
+    else if (id != -1){
+        int left, top, right, bottom;
+        left = x < 0 ? x : 0;
+        top = y < 0 ? y : 0;
+        right = x > tileMap->width -1 ? x - (tileMap->width-1) : 0;
+        bottom = y > tileMap->height -1 ? y - (tileMap->height-1) : 0;
+        TileMapResize(tileMap, left, top, right, bottom);
+        x -= left;
+        y -= top;
+        tileMap->grid[x + y*tileMap->width] = id;
+    }
 }
 
 void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom){
@@ -166,7 +168,11 @@ void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom){
     int w = tileMap->width -left +right;          //new width
     int h = tileMap->height -top +bottom;         //new height
     int* tmp = tileMap->grid;                     //preparing for deleting old pointer
-    TileMapClearGrid(tileMap);
+    
+    tileMap->grid = MemAlloc(sizeof(int) *w *h);
+    for(int i =0; i< w*h; i++){
+        tileMap->grid[i] = -1;
+    }
     
     for (int y = 0; y < tileMap->height; y++){
         if (y-top >= 0 && y-top < h){
@@ -225,6 +231,10 @@ void TileMapClearGrid(TileMap *tileMap){
     for(int i =0; i< tileMap->width*tileMap->height; i++){
         tileMap->grid[i] = -1;
     }
+}
+
+void TileMapClearGridEx(TileMap *tileMap, int x, int y, int w, int h){
+    
 }
 
 void TileMapDraw(TileMap *tileMap){
