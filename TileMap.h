@@ -94,6 +94,7 @@ void TileMapInitSize(TileMap *tileMap, int width, int height){
     tileMap->height = height;
     if (tileMap->grid){MemFree(tileMap->grid);}
     tileMap->grid = MemAlloc(sizeof(int)*width*height);
+    TileMapClearGrid(tileMap);
 }
 
 void TileMapSetGridData(TileMap *tileMap, int *data, int dataSize){
@@ -232,7 +233,10 @@ void TileMapDraw(TileMap *tileMap){
     int sy = tileMap->tileSet->tileY;
     for (int y = 0; y < h; y++){
         for (int x = 0; x < w; x++){
-            TileSetDrawTile(tileMap->tileSet, x+y*w, px + x*sx, py + y*sy);
+            int id = tileMap->grid[x+y*w];
+            if (id > -1){
+                TileSetDrawTile(tileMap->tileSet, id, px + x*sx, py + y*sy);
+            }
         }
     }
 }
@@ -303,13 +307,12 @@ void TileMapDrawPart(TileMap *tileMap, int posX, int posY, int x, int y, int wid
     int gridW = tileMap->width;
     for (int _y = y; _y < h; _y++){
         for (int _x = x; _x < w; _x++){
-            TileSetDrawTile(tileMap->tileSet, _x+_y*gridW, px + _x*sx, py + _y*sy);
+            TileSetDrawTile(tileMap->tileSet, tileMap->grid[_x+_y*gridW], px + _x*sx, py + _y*sy);
         }
     }
 }
 
 #endif //NEZ_TILEMAP_IMPLEMENTATION
-
 
 
 
