@@ -10,7 +10,7 @@ Header only libraries with separate elements - tileset.h, tilemap.h.
 To implement .c parts need to `#define` IMPLEMENTATION guard flags before `#include` of the header file:    
 ```
 #define NEZ_TILESET_IMPLEMENTATION
-#include "../tileset.h"
+#include "tileset.h"
 ```
 
 Built to be as independent system as possible, but for rendering texture and memory allocation I used the Raylib framework.
