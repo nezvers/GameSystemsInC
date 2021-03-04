@@ -53,6 +53,8 @@ TileMapGetTileWorld(TileMap *tileMap, int x, int y);                            
 NEZTMAPI void 
 TileMapSetTile(TileMap *tileMap, int x, int y, int id);                                     // Sets ID of given grid slot
 NEZTMAPI void 
+TileMapSetTileResize(TileMap *tileMap, int x, int y, int id);                                     // Sets ID of given grid slot
+NEZTMAPI void 
 TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom);                  // Moves TileMap edges by given amount
 NEZTMAPI void 
 TileMapTrim(TileMap *tileMap);                                                              // Resizes TileMap if there is unused outer collumns or rows
@@ -144,9 +146,20 @@ void TileMapSetTile(TileMap *tileMap, int x, int y, int id){
     if (xIn && yIn){
         int pos = x + y*tileMap->width;
         tileMap->grid[pos] = id;
-        if (id == -1){
-            TileMapTrim(tileMap);
-        }
+    }
+}
+
+void TileMapSetTileResize(TileMap *tileMap, int x, int y, int id){
+    if (id < -1 || id > tileMap->tileSet->tileCount -1){
+        return;
+    }
+    bool xIn = x > -1 && x < tileMap->width;
+    bool yIn = y > -1 && y < tileMap->height;
+    // sets tile within existing size
+    if (xIn && yIn){
+        int pos = x + y*tileMap->width;
+        tileMap->grid[pos] = id;
+        TileMapTrim(tileMap);
     }
     //RESIZE
     else if (id != -1){
@@ -190,8 +203,10 @@ void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom){
 
 void TileMapTrim(TileMap *tileMap){
     // init to furthest values
-    int left = tileMap->width-1;
-    int top = tileMap->height-1;
+    
+    
+    int left = tileMap->width -1;
+    int top = tileMap->height -1;
     int right = 0;
     int bottom = 0;
     // iterate through grid
@@ -199,17 +214,18 @@ void TileMapTrim(TileMap *tileMap){
         for (int x=0; x < tileMap->width; x++){
             // detect used grid sides
             if (tileMap->grid[tileMap->width*y + x] > -1){
-                if (x < left) { left = x; }
-                if (y < top)  { top = y; }
                 if (x > right) { right = x; }
                 if (y > bottom) { bottom = y; }
+                if (x < left) { left = x; }
+                if (y < top)  { top = y; }
             }
         }
     }
-    left = 0;
-    top = 0;
     right -= (tileMap->width-1);
     bottom -= (tileMap->height-1);
+    if (left == tileMap->width-1 && right == -(tileMap->width-1) && top == tileMap->height-1 && bottom == -(tileMap->height-1)){
+        return;
+    }
     if (left!=0 || top!=0 || right!=0 || bottom!=0){
         TileMapResize(tileMap, left, top, right, bottom);
     }

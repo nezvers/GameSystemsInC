@@ -95,21 +95,31 @@ void DefaultScreen(){
 void Inputs(){
     if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
         Vector2 mouse = GetMousePosition();
-        int x = (int)mouse.x / tileSet->tileX;
-        int y = (int)mouse.y / tileSet->tileY;
-        AutoTileSetCell(autoTile, x, y);
+        int x = (int)(mouse.x-tileMap->x) / tileSet->tileX;
+        int y = (int)(mouse.y-tileMap->y) / tileSet->tileY;
+        if (mouse.x < tileMap->x){x--;}
+        if (mouse.y < tileMap->y){y--;}
+        AutoTileSetCellResize(autoTile, x, y);
     }
     if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)){
         Vector2 mouse = GetMousePosition();
-        int x = (int)mouse.x / tileSet->tileX;
-        int y = (int)mouse.y / tileSet->tileY;
-        AutoTileRemoveCell(autoTile, x, y);
+        int x = (int)(mouse.x-tileMap->x) / tileSet->tileX;
+        int y = (int)(mouse.y-tileMap->y) / tileSet->tileY;
+        if (mouse.x < tileMap->x){x--;}
+        if (mouse.y < tileMap->y){y--;}
+        AutoTileRemoveCellResize(autoTile, x, y);
     }
     if(IsKeyPressed(KEY_RIGHT)){
         TileMapResize(tileMap, 0, 0, +1, 0);
     }
     else if(IsKeyPressed(KEY_LEFT)){
         TileMapResize(tileMap, 0, 0, -1, 0);
+    }
+    else if(IsKeyPressed(KEY_D)){
+        TileMapResize(tileMap, +1, 0, 0, 0);
+    }
+    else if(IsKeyPressed(KEY_A)){
+        TileMapResize(tileMap, -1, 0, 0, 0);
     }
     else if(IsKeyPressed(KEY_DOWN)){
         TileMapResize(tileMap, 0, 0, 0, +1);

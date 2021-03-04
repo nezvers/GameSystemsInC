@@ -48,7 +48,11 @@ AutoTileGetBitmask(AutoTile *autoTile, int x, int y);
 NEZATAPI void
 AutoTileSetCell(AutoTile *autoTile, int x, int y);
 NEZATAPI void
+AutoTileSetCellResize(AutoTile *autoTile, int x, int y);
+NEZATAPI void
 AutoTileRemoveCell(AutoTile *autoTile, int x, int y);
+NEZATAPI void
+AutoTileRemoveCellResize(AutoTile *autoTile, int x, int y);
 NEZATAPI void
 AutoTileUpdateCell(AutoTile *autoTile, int x, int y);
 NEZATAPI int
@@ -162,8 +166,39 @@ void AutoTileSetCell(AutoTile *autoTile, int x, int y){
     AutoTileUpdateCell(autoTile, x+1, y+1);
 }
 
+void AutoTileSetCellResize(AutoTile *autoTile, int x, int y){
+    int bitmask = AutoTileGetBitmask(autoTile, x, y);
+    bitmask = bitmask > -1 ? bitmask : 0;
+    int id = autoTile->lookup[bitmask];
+    TileMapSetTileResize(autoTile->tileMap, x, y, id);
+    
+    // update cells around
+    AutoTileUpdateCell(autoTile, x-1, y-1);
+    AutoTileUpdateCell(autoTile, x,   y-1);
+    AutoTileUpdateCell(autoTile, x+1, y-1);
+    AutoTileUpdateCell(autoTile, x-1, y);
+    AutoTileUpdateCell(autoTile, x+1, y);
+    AutoTileUpdateCell(autoTile, x-1, y+1);
+    AutoTileUpdateCell(autoTile, x,   y+1);
+    AutoTileUpdateCell(autoTile, x+1, y+1);
+}
+
 void AutoTileRemoveCell(AutoTile *autoTile, int x, int y){
     TileMapSetTile(autoTile->tileMap, x, y, -1);
+    
+    // update cells around
+    AutoTileUpdateCell(autoTile, x-1, y-1);
+    AutoTileUpdateCell(autoTile, x,   y-1);
+    AutoTileUpdateCell(autoTile, x+1, y-1);
+    AutoTileUpdateCell(autoTile, x-1, y);
+    AutoTileUpdateCell(autoTile, x+1, y);
+    AutoTileUpdateCell(autoTile, x-1, y+1);
+    AutoTileUpdateCell(autoTile, x,   y+1);
+    AutoTileUpdateCell(autoTile, x+1, y+1);
+}
+
+void AutoTileRemoveCellResize(AutoTile *autoTile, int x, int y){
+    TileMapSetTileResize(autoTile->tileMap, x, y, -1);
     
     // update cells around
     AutoTileUpdateCell(autoTile, x-1, y-1);
