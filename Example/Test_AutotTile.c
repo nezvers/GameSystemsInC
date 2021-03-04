@@ -19,6 +19,7 @@
 #include "../tilemap.h"
 #define NEZ_TILESET_IMPLEMENTATION
 #include "../tileset.h"
+#include "../Resource/TileSetterBitmask.h"
 
 int screenWidth = 480;
 int screenHeight = 240;
@@ -31,6 +32,7 @@ void Inputs(void);
 
 TileSet *tileSet;
 TileMap *tileMap;
+AutoTile *autoTile;
 
 int main(){
     // Initialization
@@ -65,7 +67,8 @@ void InitGame(void){
     tileMap = TileMapNew();
     tileMap->tileSet = tileSet;
     TileMapInitSize(tileMap, 20, 10);
-    printf("***** (%d, %d)\n", tileMap->width, tileMap->height);
+    autoTile = AutoTileNewInit(tileMap);
+    //AutoTileSetBitmaskData(autoTile, (int*)&bitmaskData, sizeof(bitmaskData));
     
 	Screen = DefaultScreen;
 }
@@ -90,7 +93,12 @@ void DefaultScreen(){
 
 
 void Inputs(){
-    
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+        Vector2 mouse = GetMousePosition();
+        int x = (int)mouse.x / tileSet->tileX;
+        int y = (int)mouse.y / tileSet->tileY;
+        AutoTileSetCell(autoTile, x, y);
+    }
 }
 
 
