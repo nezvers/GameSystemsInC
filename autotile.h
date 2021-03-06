@@ -16,7 +16,6 @@ typedef struct {
     TileMap *tileMap;
     TileSet *tileSet;
     int *id;      // hold bitmask rules for each tile ID - 3x3 bitmask
-    int tileCount;
     BMASK lookup[256];    // lookup table for tiles by bitmask - 9 bits
 }AutoTile;
 
@@ -121,7 +120,6 @@ void AutoTileInit(AutoTile *autoTile, TileMap *tileMap, int *tileList, int tileC
     
     if (autoTile->id){free(autoTile->id);}
     autoTile->id = malloc(sizeof(int) *tileCount);
-    autoTile->tileCount = tileCount;
     
     // assign tileSet IDs to autoTile->id
     for (int i=0; i<tileCount; i++){
