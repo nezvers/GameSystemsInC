@@ -6,6 +6,7 @@
 #define NEZ_TILESET_H
 
 #include "raylib.h"
+#include "stdlib.h"
 
 
 typedef struct{
@@ -54,7 +55,7 @@ TileSetDrawTile(TileSet *tileSet, int id, int x, int y);                // Draws
 #undef NEZ_TILESET_IMPLEMENTATION
 
 TileSet*    TileSetNew(){
-    TileSet *tileSet = MemAlloc(sizeof(TileSet));
+    TileSet *tileSet = malloc(sizeof(TileSet));
     return tileSet;
 }
 
@@ -73,7 +74,7 @@ TileSet* TileSetNewInitFromMemory(Texture texture, int tileWidth, int tileHeight
 }
 
 void TileSetDestroy(TileSet* tileSet){
-    MemFree(tileSet);
+    free(tileSet);
 }
 
 void TileSetDestroyWithTexture(TileSet* tileSet){

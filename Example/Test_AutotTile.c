@@ -19,7 +19,7 @@
 #include "../tilemap.h"
 #define NEZ_TILESET_IMPLEMENTATION
 #include "../tileset.h"
-#include "../Resource/TileSetterBitmask.h"
+#include "../Resource/TileSetBitmask.h"
 
 int screenWidth = 480;
 int screenHeight = 240;
@@ -63,11 +63,13 @@ int main(){
 }
 
 void InitGame(void){
-    tileSet = TileSetNewInitFromFile("../Resource/TileSetter_template.png", 16, 16);
+    //tileSet = TileSetNewInitFromFile("../Resource/TileSetter_template.png", 16, 16);
+    tileSet = TileSetNewInitFromFile("../Resource/grass_and_dirt_tiles.png", 16, 16);
+    
     tileMap = TileMapNew();
     tileMap->tileSet = tileSet;
     TileMapInitSize(tileMap, 20, 10);
-    autoTile = AutoTileNewInit(tileMap);
+    autoTile = AutoTileNewInit(tileMap, 0, 5, 10, 5);
     AutoTileSetBitmaskData(autoTile, (int*)&bitmaskData, sizeof(bitmaskData));
     
 	Screen = DefaultScreen;
