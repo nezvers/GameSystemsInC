@@ -21,6 +21,7 @@ typedef struct{
 }TileMap;
 
 //Used for returning tile position
+//And offset caused by resizing
 typedef struct{
     int x;
     int y;
@@ -52,11 +53,11 @@ NEZTMAPI int
 TileMapGetTileWorld(TileMap *tileMap, int x, int y);                                        // Gets tile ID using world coordinates
 NEZTMAPI void 
 TileMapSetTile(TileMap *tileMap, int x, int y, int id);                                     // Sets ID of given grid slot
-NEZTMAPI void 
+NEZTMAPI TilePosition 
 TileMapSetTileResize(TileMap *tileMap, int x, int y, int id);                                     // Sets ID of given grid slot
-NEZTMAPI void 
+NEZTMAPI void
 TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom);                  // Moves TileMap edges by given amount
-NEZTMAPI void 
+NEZTMAPI TilePosition 
 TileMapTrim(TileMap *tileMap);                                                              // Resizes TileMap if there is unused outer collumns or rows
 NEZTMAPI TilePosition 
 TileMapWorld2Tile(TileMap *tileMap, int x, int y);                                          // Convert world coordinates to tile coordinates
@@ -85,21 +86,22 @@ TileMapDrawGrid(TileMap *tileMap, Color color);
 #ifdef NEZ_TILEMAP_IMPLEMENTATION
 #undef NEZ_TILEMAP_IMPLEMENTATION
 TileMap* TileMapNew(){
-    TileMap *tileMap = MemAlloc(sizeof(TileMap));
+    TileMap *tileMap = malloc(sizeof(TileMap));
     *tileMap = (TileMap){0};
+    TileMapInitSize(tileMap, 1, 1);
     return tileMap;
 }
 
 void TileMapDestroy(TileMap *tileMap){
-    MemFree(tileMap->grid);
-    MemFree(tileMap);
+    if(tileMap->grid){free(tileMap->grid);}
+    free(tileMap);
 }
 
 void TileMapInitSize(TileMap *tileMap, int width, int height){
     tileMap->width = width;
     tileMap->height = height;
-    if (tileMap->grid){MemFree(tileMap->grid);}
-    tileMap->grid = MemAlloc(sizeof(int)*width*height);
+    if (tileMap->grid){free(tileMap->grid);}
+    tileMap->grid = malloc(sizeof(int)*width*height);
     TileMapClearGrid(tileMap);
 }
 
@@ -149,17 +151,20 @@ void TileMapSetTile(TileMap *tileMap, int x, int y, int id){
     }
 }
 
-void TileMapSetTileResize(TileMap *tileMap, int x, int y, int id){
+TilePosition TileMapSetTileResize(TileMap *tileMap, int x, int y, int id){
+    TilePosition offset = {0};
+    
     if (id < -1 || id > tileMap->tileSet->tileCount -1){
-        return;
+        return offset;
     }
     bool xIn = x > -1 && x < tileMap->width;
     bool yIn = y > -1 && y < tileMap->height;
+    
     // sets tile within existing size
     if (xIn && yIn){
         int pos = x + y*tileMap->width;
         tileMap->grid[pos] = id;
-        TileMapTrim(tileMap);
+        if (id > -1){return offset;}
     }
     //RESIZE
     else if (id != -1){
@@ -171,18 +176,34 @@ void TileMapSetTileResize(TileMap *tileMap, int x, int y, int id){
         TileMapResize(tileMap, left, top, right, bottom);
         x -= left;
         y -= top;
+        offset = (TilePosition){left, top};
         tileMap->grid[x + y*tileMap->width] = id;
     }
+    TilePosition trimOffset = TileMapTrim(tileMap);
+    offset.x += trimOffset.x;
+    offset.y += trimOffset.y;
+    return offset;
 }
 
 void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom){
-    tileMap->x += (float)left*tileMap->tileSet->tileX;     //reposition horizontally
-    tileMap->y += (float)top*tileMap->tileSet->tileY;      //reposition vertically
+    // TO DO: negative resize bug
+    // printf("%d, %d\n", left, tileMap->width +right);
+    // if (left >= tileMap->width +right){
+        // left = tileMap->width +right -left;
+        // right = left - tileMap->width +right;
+    // }
+    // if (top > tileMap->height +bottom){
+        // top = tileMap->height +bottom -top;
+        // bottom = top - tileMap->height +bottom;
+    // }
+    
+    tileMap->x += left*tileMap->tileSet->tileX;     //reposition horizontally
+    tileMap->y += top*tileMap->tileSet->tileY;      //reposition vertically
     int w = tileMap->width -left +right;          //new width
     int h = tileMap->height -top +bottom;         //new height
     int* tmp = tileMap->grid;                     //preparing for deleting old pointer
     
-    tileMap->grid = MemAlloc(sizeof(int) *w *h);
+    tileMap->grid = malloc(sizeof(int) *w *h);
     for(int i =0; i< w*h; i++){
         tileMap->grid[i] = -1;
     }
@@ -196,12 +217,12 @@ void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom){
             }
         }
     }
-    MemFree(tmp);
+    free(tmp);
     tileMap->width = w;
     tileMap->height = h;
 }
 
-void TileMapTrim(TileMap *tileMap){
+TilePosition TileMapTrim(TileMap *tileMap){
     // init to furthest values
     
     
@@ -223,18 +244,24 @@ void TileMapTrim(TileMap *tileMap){
     }
     right -= (tileMap->width-1);
     bottom -= (tileMap->height-1);
+    TilePosition offset = {0};
     if (left == tileMap->width-1 && right == -(tileMap->width-1) && top == tileMap->height-1 && bottom == -(tileMap->height-1)){
-        return;
+        return offset;
     }
     if (left!=0 || top!=0 || right!=0 || bottom!=0){
         TileMapResize(tileMap, left, top, right, bottom);
     }
+    return (TilePosition){left, top};
 }
 
 TilePosition TileMapWorld2Tile(TileMap *tileMap, int x, int y){
-    int _x = x-tileMap->x/tileMap->tileSet->tileX;
-    int _y = y-tileMap->y/tileMap->tileSet->tileY;
-    return (TilePosition){_x, _y};
+    x = (x-tileMap->x);
+    y = (y-tileMap->y);
+    if(x < 0){x -= tileMap->tileSet->tileX;}
+    if(y < 0){y -= tileMap->tileSet->tileY;}
+    x = x/tileMap->tileSet->tileX;
+    y = y/tileMap->tileSet->tileY;
+    return (TilePosition){x, y};
 }
 
 TilePosition TileMapTile2World(TileMap *tileMap, int x, int y){
