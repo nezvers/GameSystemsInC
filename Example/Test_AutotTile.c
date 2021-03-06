@@ -81,8 +81,11 @@ void InitGame(void){
     autoTile1 = AutoTileNewInitTileRegion(tileMap1, 0, 0, 10, 5);
     AutoTileSetBitmaskData(autoTile1, (int*)&bitmaskData, sizeof(bitmaskData)/ sizeof(bitmaskData[0]));
     
-    autoTile2 = AutoTileNewInitTileRegion(tileMap2, 0, 5, 10, 5);
+    // create AutoTile providing list of TileSet IDs
+    int tileList[] = {50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99};
+    autoTile2 = AutoTileNewInitTileList(tileMap2, (int*)&tileList, sizeof(tileList)/ sizeof(tileList[0]));
     AutoTileSetBitmaskData(autoTile2, (int*)&bitmaskData, sizeof(bitmaskData)/ sizeof(bitmaskData[0]));
+    
     autoTile = autoTile1;
     
 	Screen = DefaultScreen;
