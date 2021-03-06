@@ -32,9 +32,9 @@ extern "C" {
 #endif
 
 NEZATAPI AutoTile*
-AutoTileNew(void);
+AutoTileNew(void);                                                                  // Allocate memory
 NEZATAPI void
-AutoTileDestroy(AutoTile *autoTile);
+AutoTileDestroy(AutoTile *autoTile);                                                // Free memory
 // TileMap has to have assigned TileSet
 NEZATAPI AutoTile*
 AutoTileNewInitTileRegion(TileMap *tileMap, int tx, int ty, int tw, int th);        // create new tilemap, requires region of TileSet
@@ -43,27 +43,31 @@ AutoTileNewInitTileList(TileMap *tileMap, int *tileList, int tileCount);        
 NEZATAPI void
 AutoTileInit(AutoTile *autoTile, TileMap *tileMap, int *tileList, int tileCount);   // Init existing autotile, requires region of TileSet
 NEZATAPI void
-AutoTileSetBitmaskData(AutoTile *autoTile, int *data, int dataSize);
+AutoTileSetBitmaskData(AutoTile *autoTile, int *data, int dataSize);                // Creates lookup array for tile IDs
 NEZATAPI int
-AutoTileGetBitmask(AutoTile *autoTile, int x, int y);
+AutoTileGetBitmask(AutoTile *autoTile, int x, int y);                               // scan bitmask value for tile position
 NEZATAPI void
-AutoTileSetCell(AutoTile *autoTile, int x, int y);
+AutoTileSetCell(AutoTile *autoTile, int x, int y);                                  // Set TileMap cell ID and update surrounding
 NEZATAPI void
-AutoTileSetCellResize(AutoTile *autoTile, int x, int y);
+AutoTileSetCellWorld(AutoTile *autoTile, int x, int y);                             // World coordinates
 NEZATAPI void
-AutoTileSetCellResizeWorld(AutoTile *autoTile, int x, int y);
+AutoTileSetCellResize(AutoTile *autoTile, int x, int y);                            // Set TileMap cell ID, allows to expand existing TileMap grid
 NEZATAPI void
-AutoTileRemoveCell(AutoTile *autoTile, int x, int y);
+AutoTileSetCellResizeWorld(AutoTile *autoTile, int x, int y);                       // World coordinates
 NEZATAPI void
-AutoTileRemoveCellResize(AutoTile *autoTile, int x, int y);
+AutoTileRemoveCell(AutoTile *autoTile, int x, int y);                               // Clears TileMap cell and update surrounding cells
 NEZATAPI void
-AutoTileRemoveCellResizeWorld(AutoTile *autoTile, int x, int y);
+AutoTileRemoveCellWorld(AutoTile *autoTile, int x, int y);                          // World coordinates
 NEZATAPI void
-AutoTileUpdateCell(AutoTile *autoTile, int x, int y);
+AutoTileRemoveCellResize(AutoTile *autoTile, int x, int y);                         // Allows to trim the TileMap grid
 NEZATAPI void
-AutoTileUpdateCellsAround(AutoTile *autoTile, int x, int y);
+AutoTileRemoveCellResizeWorld(AutoTile *autoTile, int x, int y);                    // World coordinates
+NEZATAPI void
+AutoTileUpdateCell(AutoTile *autoTile, int x, int y);                               // Update Tilemap cell ID with new bitmask matched ID
+NEZATAPI void
+AutoTileUpdateCellsAround(AutoTile *autoTile, int x, int y);                        // Update surrounding TileMap cells
 NEZATAPI int
-GetSetBitCount(int n);
+GetSetBitCount(int n);                                                              // Necessary function to count how many bits ar enabled
 
 #ifdef __cplusplus
 }
@@ -187,6 +191,11 @@ void AutoTileSetCell(AutoTile *autoTile, int x, int y){
     AutoTileUpdateCellsAround(autoTile, x, y);
 }
 
+void AutoTileSetCellWorld(AutoTile *autoTile, int x, int y){
+    TilePosition tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
+    AutoTileSetCell(autoTile, tp.x, tp.y);
+}
+
 
 void AutoTileSetCellResize(AutoTile *autoTile, int x, int y){
     int bitmask = AutoTileGetBitmask(autoTile, x, y);
@@ -209,6 +218,11 @@ void AutoTileRemoveCell(AutoTile *autoTile, int x, int y){
     TileMapSetTile(autoTile->tileMap, x, y, -1);
     
     AutoTileUpdateCellsAround(autoTile, x, y);
+}
+
+void AutoTileRemoveCellWorld(AutoTile *autoTile, int x, int y){
+    TilePosition tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
+    AutoTileRemoveCell(autoTile, tp.x, tp.y);
 }
 
 void AutoTileRemoveCellResize(AutoTile *autoTile, int x, int y){
