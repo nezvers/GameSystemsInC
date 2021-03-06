@@ -20,14 +20,9 @@ Built to be as independent system as possible, but for rendering texture and mem
 If using different framework only need to change:    
 tileset.h    
 - TileSetDrawTile()
-- MemAlloc()
-- MemFree()
 
 tilemap.h
 - TileMapDrawGrid()
-- MemAlloc()
-- MemFree()
 
 Example code used Raylib.
 
-Future plan is to make also an autotiling header.
