@@ -21,6 +21,7 @@ typedef struct{
 }TileMap;
 
 //Used for returning tile position
+//And offset caused by resizing
 typedef struct{
     int x;
     int y;
@@ -52,11 +53,11 @@ NEZTMAPI int
 TileMapGetTileWorld(TileMap *tileMap, int x, int y);                                        // Gets tile ID using world coordinates
 NEZTMAPI void 
 TileMapSetTile(TileMap *tileMap, int x, int y, int id);                                     // Sets ID of given grid slot
-NEZTMAPI void 
+NEZTMAPI TilePosition 
 TileMapSetTileResize(TileMap *tileMap, int x, int y, int id);                                     // Sets ID of given grid slot
-NEZTMAPI void 
+NEZTMAPI void
 TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom);                  // Moves TileMap edges by given amount
-NEZTMAPI void 
+NEZTMAPI TilePosition 
 TileMapTrim(TileMap *tileMap);                                                              // Resizes TileMap if there is unused outer collumns or rows
 NEZTMAPI TilePosition 
 TileMapWorld2Tile(TileMap *tileMap, int x, int y);                                          // Convert world coordinates to tile coordinates
@@ -150,16 +151,20 @@ void TileMapSetTile(TileMap *tileMap, int x, int y, int id){
     }
 }
 
-void TileMapSetTileResize(TileMap *tileMap, int x, int y, int id){
+TilePosition TileMapSetTileResize(TileMap *tileMap, int x, int y, int id){
+    TilePosition offset = {0};
+    
     if (id < -1 || id > tileMap->tileSet->tileCount -1){
-        return;
+        return offset;
     }
     bool xIn = x > -1 && x < tileMap->width;
     bool yIn = y > -1 && y < tileMap->height;
+    
     // sets tile within existing size
     if (xIn && yIn){
         int pos = x + y*tileMap->width;
         tileMap->grid[pos] = id;
+        if (id > -1){return offset;}
     }
     //RESIZE
     else if (id != -1){
@@ -171,9 +176,13 @@ void TileMapSetTileResize(TileMap *tileMap, int x, int y, int id){
         TileMapResize(tileMap, left, top, right, bottom);
         x -= left;
         y -= top;
+        offset = (TilePosition){left, top};
         tileMap->grid[x + y*tileMap->width] = id;
     }
-    TileMapTrim(tileMap);
+    TilePosition trimOffset = TileMapTrim(tileMap);
+    offset.x += trimOffset.x;
+    offset.y += trimOffset.y;
+    return offset;
 }
 
 void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom){
@@ -213,7 +222,7 @@ void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom){
     tileMap->height = h;
 }
 
-void TileMapTrim(TileMap *tileMap){
+TilePosition TileMapTrim(TileMap *tileMap){
     // init to furthest values
     
     
@@ -235,18 +244,24 @@ void TileMapTrim(TileMap *tileMap){
     }
     right -= (tileMap->width-1);
     bottom -= (tileMap->height-1);
+    TilePosition offset = {0};
     if (left == tileMap->width-1 && right == -(tileMap->width-1) && top == tileMap->height-1 && bottom == -(tileMap->height-1)){
-        return;
+        return offset;
     }
     if (left!=0 || top!=0 || right!=0 || bottom!=0){
         TileMapResize(tileMap, left, top, right, bottom);
     }
+    return (TilePosition){left, top};
 }
 
 TilePosition TileMapWorld2Tile(TileMap *tileMap, int x, int y){
-    int _x = x-tileMap->x/tileMap->tileSet->tileX;
-    int _y = y-tileMap->y/tileMap->tileSet->tileY;
-    return (TilePosition){_x, _y};
+    x = (x-tileMap->x);
+    y = (y-tileMap->y);
+    if(x < 0){x -= tileMap->tileSet->tileX;}
+    if(y < 0){y -= tileMap->tileSet->tileY;}
+    x = x/tileMap->tileSet->tileX;
+    y = y/tileMap->tileSet->tileY;
+    return (TilePosition){x, y};
 }
 
 TilePosition TileMapTile2World(TileMap *tileMap, int x, int y){

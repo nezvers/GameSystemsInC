@@ -31,8 +31,11 @@ void DefaultScreen(void);
 void Inputs(void);
 
 TileSet *tileSet;
-TileMap *tileMap;
+TileMap *tileMap1;
+TileMap *tileMap2;
 AutoTile *autoTile;
+AutoTile *autoTile1;
+AutoTile *autoTile2;
 
 int main(){
     // Initialization
@@ -56,7 +59,10 @@ int main(){
     // De-Initialization
     //--------------------------------------------------------------------------------------
     TileSetDestroy(tileSet);
-    TileMapDestroy(tileMap);
+    TileMapDestroy(tileMap1);
+    TileMapDestroy(tileMap2);
+    AutoTileDestroy(autoTile1);
+    AutoTileDestroy(autoTile2);
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
     return 0;
@@ -66,11 +72,18 @@ void InitGame(void){
     //tileSet = TileSetNewInitFromFile("../Resource/TileSetter_template.png", 16, 16);
     tileSet = TileSetNewInitFromFile("../Resource/grass_and_dirt_tiles.png", 16, 16);
     
-    tileMap = TileMapNew();
-    tileMap->tileSet = tileSet;
-    TileMapInitSize(tileMap, 20, 10);
-    autoTile = AutoTileNewInit(tileMap, 0, 5, 10, 5);
-    AutoTileSetBitmaskData(autoTile, (int*)&bitmaskData, sizeof(bitmaskData));
+    // tilemap for each autoTile
+    tileMap1 = TileMapNew();
+    tileMap1->tileSet = tileSet;
+    tileMap2 = TileMapNew();
+    tileMap2->tileSet = tileSet;
+    
+    autoTile1 = AutoTileNewInitTileRegion(tileMap1, 0, 0, 10, 5);
+    AutoTileSetBitmaskData(autoTile1, (int*)&bitmaskData, sizeof(bitmaskData)/ sizeof(bitmaskData[0]));
+    
+    autoTile2 = AutoTileNewInitTileRegion(tileMap2, 0, 5, 10, 5);
+    AutoTileSetBitmaskData(autoTile2, (int*)&bitmaskData, sizeof(bitmaskData)/ sizeof(bitmaskData[0]));
+    autoTile = autoTile1;
     
 	Screen = DefaultScreen;
 }
@@ -87,8 +100,10 @@ void DefaultScreen(){
     //----------------------------------------------------------------------------------
     BeginDrawing();
     ClearBackground(RAYWHITE);
-        TileMapDrawGrid(tileMap, BLACK);
-        TileMapDraw(tileMap);
+        TileMapDrawGrid(tileMap1, BLACK);
+        TileMapDrawGrid(tileMap2, BLACK);
+        TileMapDraw(tileMap2); //dirt
+        TileMapDraw(tileMap1); //grass
         //TileMapDrawExWorld(tileMap, 0, 0, 20, 10);
     EndDrawing();
 }
@@ -97,37 +112,18 @@ void DefaultScreen(){
 void Inputs(){
     if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
         Vector2 mouse = GetMousePosition();
-        int x = (int)(mouse.x-tileMap->x) / tileSet->tileX;
-        int y = (int)(mouse.y-tileMap->y) / tileSet->tileY;
-        if (mouse.x < tileMap->x){x--;}
-        if (mouse.y < tileMap->y){y--;}
-        AutoTileSetCellResize(autoTile, x, y);
+        AutoTileSetCellResizeWorld(autoTile, (int)mouse.x, (int)mouse.y);
     }
-    if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)){
+    else if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)){
         Vector2 mouse = GetMousePosition();
-        int x = (int)(mouse.x-tileMap->x) / tileSet->tileX;
-        int y = (int)(mouse.y-tileMap->y) / tileSet->tileY;
-        if (mouse.x < tileMap->x){x--;}
-        if (mouse.y < tileMap->y){y--;}
-        AutoTileRemoveCellResize(autoTile, x, y);
+        AutoTileRemoveCellResizeWorld(autoTile, (int)mouse.x, (int)mouse.y);
     }
-    if(IsKeyPressed(KEY_RIGHT)){
-        TileMapResize(tileMap, 0, 0, +1, 0);
+    // change active AutoTile
+    if(IsKeyPressed(KEY_ONE)){
+        autoTile = autoTile1;
     }
-    else if(IsKeyPressed(KEY_LEFT)){
-        TileMapResize(tileMap, 0, 0, -1, 0);
-    }
-    else if(IsKeyPressed(KEY_D)){
-        TileMapResize(tileMap, +1, 0, 0, 0);
-    }
-    else if(IsKeyPressed(KEY_A)){
-        TileMapResize(tileMap, -1, 0, 0, 0);
-    }
-    else if(IsKeyPressed(KEY_DOWN)){
-        TileMapResize(tileMap, 0, 0, 0, +1);
-    }
-    else if(IsKeyPressed(KEY_UP)){
-        TileMapResize(tileMap, 0, 0, 0, -1);
+    else if(IsKeyPressed(KEY_TWO)){
+        autoTile = autoTile2;
     }
 }
 

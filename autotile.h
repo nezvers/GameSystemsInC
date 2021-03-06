@@ -36,14 +36,15 @@ NEZATAPI AutoTile*
 AutoTileNew(void);
 NEZATAPI void
 AutoTileDestroy(AutoTile *autoTile);
+// TileMap has to have assigned TileSet
 NEZATAPI AutoTile*
-AutoTileNewInit(TileMap *tileMap, int tx, int ty, int tw, int th);                  // create new tilemap, requires region of TileSet
+AutoTileNewInitTileRegion(TileMap *tileMap, int tx, int ty, int tw, int th);        // create new tilemap, requires region of TileSet
+NEZATAPI AutoTile*
+AutoTileNewInitTileList(TileMap *tileMap, int *tileList, int tileCount);            // create new tilemap, requires array of tile IDs
 NEZATAPI void
-AutoTileInit(AutoTile *autoTile, TileMap *tileMap, int tx, int ty, int tw, int th); // Init existing autotile, requires region of TileSet
+AutoTileInit(AutoTile *autoTile, TileMap *tileMap, int *tileList, int tileCount);   // Init existing autotile, requires region of TileSet
 NEZATAPI void
 AutoTileSetBitmaskData(AutoTile *autoTile, int *data, int dataSize);
-NEZATAPI void
-AutoTileSetLookup(AutoTile *autoTile);
 NEZATAPI int
 AutoTileGetBitmask(AutoTile *autoTile, int x, int y);
 NEZATAPI void
@@ -51,11 +52,17 @@ AutoTileSetCell(AutoTile *autoTile, int x, int y);
 NEZATAPI void
 AutoTileSetCellResize(AutoTile *autoTile, int x, int y);
 NEZATAPI void
+AutoTileSetCellResizeWorld(AutoTile *autoTile, int x, int y);
+NEZATAPI void
 AutoTileRemoveCell(AutoTile *autoTile, int x, int y);
 NEZATAPI void
 AutoTileRemoveCellResize(AutoTile *autoTile, int x, int y);
 NEZATAPI void
+AutoTileRemoveCellResizeWorld(AutoTile *autoTile, int x, int y);
+NEZATAPI void
 AutoTileUpdateCell(AutoTile *autoTile, int x, int y);
+NEZATAPI void
+AutoTileUpdateCellsAround(AutoTile *autoTile, int x, int y);
 NEZATAPI int
 GetSetBitCount(int n);
 
@@ -81,40 +88,56 @@ void AutoTileDestroy(AutoTile *autoTile){
     free(autoTile);
 }
 
-// TileMap has to have assigned TileSet
-AutoTile* AutoTileNewInit(TileMap *tileMap, int tx, int ty, int tw, int th){
+
+AutoTile* AutoTileNewInitTileRegion(TileMap *tileMap, int tx, int ty, int tw, int th){
     AutoTile *autoTile = AutoTileNew();
-    AutoTileInit(autoTile, tileMap, tx, ty, tw, th);
+    
+    // create tileList
+    int tileCount = tw*th;
+    int *tileList = malloc(sizeof(int) *tileCount);
+    int col = tileMap->tileSet->collumns;
+    for (int y=0; y<th; y++){
+        for (int x=0; x < tw; x++){
+            int id = tx+ty*col + x+y*col;
+            tileList[x+y*tw] = id;
+        }
+    }
+    AutoTileInit(autoTile, tileMap, tileList, tileCount);
+    free(tileList);
     return autoTile;
 }
 
-void AutoTileInit(AutoTile *autoTile, TileMap *tileMap, int tx, int ty, int tw, int th){
+AutoTile* AutoTileNewInitTileList(TileMap *tileMap, int *tileList, int tileCount){
+    AutoTile *autoTile = AutoTileNew();
+    
+    AutoTileInit(autoTile, tileMap, tileList, tileCount);
+    free(tileList);
+    return autoTile;
+}
+
+void AutoTileInit(AutoTile *autoTile, TileMap *tileMap, int *tileList, int tileCount){
     autoTile->tileMap = tileMap;
     autoTile->tileSet = tileMap->tileSet;
     
     if (autoTile->id){free(autoTile->id);}
-    autoTile->id = malloc(sizeof(int) * tw *th);
-    autoTile->tileCount = tw*th;
+    autoTile->id = malloc(sizeof(int) *tileCount);
+    autoTile->tileCount = tileCount;
     
     // assign tileSet IDs to autoTile->id
-    int col = autoTile->tileSet->collumns;
-    for (int y=0; y<th; y++){
-        for (int x=0; x < tw; x++){
-            int id = tx+ty*col + x+y*col;
-            autoTile->id[x+y*tw] = id;
-        }
+    for (int i=0; i<tileCount; i++){
+        autoTile->id[i] = tileList[i];
     }
 }
 
+// dataSize must not exceed tileList
 void AutoTileSetBitmaskData(AutoTile *autoTile, int *data, int dataSize){
-    int it = dataSize < autoTile->tileCount ? dataSize : autoTile->tileCount;
-    
     // find tile ID with most bits in each position
     for(int i = 0; i < 256; i++){
         int maxBits = -1;
         int id = 0;
+        // flip all bits in i
         int negativeMask = i ^ 0xFF;
-        for(int j = 0; j < it; j++){
+        for(int j = 0; j < dataSize; j++){
             int bitmask = data[j];
             
             // accept only if doesn't have bits that "i" doesn't have
@@ -122,7 +145,7 @@ void AutoTileSetBitmaskData(AutoTile *autoTile, int *data, int dataSize){
                 int bits = GetSetBitCount(bitmask & i);
                 if (bits > maxBits){
                     maxBits = bits;
-                    id = autoTile->id[j];
+                    id = j;
                 }
             }
         }
@@ -134,12 +157,18 @@ void AutoTileSetBitmaskData(AutoTile *autoTile, int *data, int dataSize){
 int AutoTileGetBitmask(AutoTile *autoTile, int x, int y){
     int bitmask = 0;
     
+    // Neighbour values
+    // -------------
+    // | 1  2  4   |
+    // | 8  0  16  |
+    // | 32 64 128 |
+    // -------------
     // scan tiles around and set coresponding bits
-    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x-1, y-1) > -1);          // -------------
-    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x,   y-1) > -1) << 1;     // | 1  2  4   |
-    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x+1, y-1) > -1) << 2;     // | 8  0  16  |
-    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x-1, y)   > -1) << 3;     // | 32 64 128 |
-    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x+1, y)   > -1) << 4;     // -------------
+    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x-1, y-1) > -1);
+    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x,   y-1) > -1) << 1;
+    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x+1, y-1) > -1) << 2;
+    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x-1, y)   > -1) << 3;
+    bitmask += (int)(TileMapGetTile(autoTile->tileMap, x+1, y)   > -1) << 4;
     bitmask += (int)(TileMapGetTile(autoTile->tileMap, x-1, y+1) > -1) << 5;
     bitmask += (int)(TileMapGetTile(autoTile->tileMap, x,   y+1) > -1) << 6;
     bitmask += (int)(TileMapGetTile(autoTile->tileMap, x+1, y+1) > -1) << 7;
@@ -157,60 +186,42 @@ void AutoTileSetCell(AutoTile *autoTile, int x, int y){
     int id = autoTile->id[ autoTile->lookup[bitmask] ];
     TileMapSetTile(autoTile->tileMap, x, y, id);
     
-    // update cells around
-    AutoTileUpdateCell(autoTile, x-1, y-1);
-    AutoTileUpdateCell(autoTile, x,   y-1);
-    AutoTileUpdateCell(autoTile, x+1, y-1);
-    AutoTileUpdateCell(autoTile, x-1, y);
-    AutoTileUpdateCell(autoTile, x+1, y);
-    AutoTileUpdateCell(autoTile, x-1, y+1);
-    AutoTileUpdateCell(autoTile, x,   y+1);
-    AutoTileUpdateCell(autoTile, x+1, y+1);
+    AutoTileUpdateCellsAround(autoTile, x, y);
 }
+
 
 void AutoTileSetCellResize(AutoTile *autoTile, int x, int y){
     int bitmask = AutoTileGetBitmask(autoTile, x, y);
+    // if empty cell, then new tile has bitmask of 0
     bitmask = bitmask > -1 ? bitmask : 0;
     int id = autoTile->id[ autoTile->lookup[bitmask] ];
-    TileMapSetTileResize(autoTile->tileMap, x, y, id);
+    TilePosition offset = TileMapSetTileResize(autoTile->tileMap, x, y, id);
     
-    // update cells around
-    AutoTileUpdateCell(autoTile, x-1, y-1);
-    AutoTileUpdateCell(autoTile, x,   y-1);
-    AutoTileUpdateCell(autoTile, x+1, y-1);
-    AutoTileUpdateCell(autoTile, x-1, y);
-    AutoTileUpdateCell(autoTile, x+1, y);
-    AutoTileUpdateCell(autoTile, x-1, y+1);
-    AutoTileUpdateCell(autoTile, x,   y+1);
-    AutoTileUpdateCell(autoTile, x+1, y+1);
+    
+    AutoTileUpdateCellsAround(autoTile, x -offset.x, y -offset.y);
+}
+
+
+void AutoTileSetCellResizeWorld(AutoTile *autoTile, int x, int y){
+    TilePosition tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
+    AutoTileSetCellResize(autoTile, tp.x, tp.y);
 }
 
 void AutoTileRemoveCell(AutoTile *autoTile, int x, int y){
     TileMapSetTile(autoTile->tileMap, x, y, -1);
     
-    // update cells around
-    AutoTileUpdateCell(autoTile, x-1, y-1);
-    AutoTileUpdateCell(autoTile, x,   y-1);
-    AutoTileUpdateCell(autoTile, x+1, y-1);
-    AutoTileUpdateCell(autoTile, x-1, y);
-    AutoTileUpdateCell(autoTile, x+1, y);
-    AutoTileUpdateCell(autoTile, x-1, y+1);
-    AutoTileUpdateCell(autoTile, x,   y+1);
-    AutoTileUpdateCell(autoTile, x+1, y+1);
+    AutoTileUpdateCellsAround(autoTile, x, y);
 }
 
 void AutoTileRemoveCellResize(AutoTile *autoTile, int x, int y){
-    TileMapSetTileResize(autoTile->tileMap, x, y, -1);
+    TilePosition offset = TileMapSetTileResize(autoTile->tileMap, x, y, -1);
     
-    // update cells around
-    AutoTileUpdateCell(autoTile, x-1, y-1);
-    AutoTileUpdateCell(autoTile, x,   y-1);
-    AutoTileUpdateCell(autoTile, x+1, y-1);
-    AutoTileUpdateCell(autoTile, x-1, y);
-    AutoTileUpdateCell(autoTile, x+1, y);
-    AutoTileUpdateCell(autoTile, x-1, y+1);
-    AutoTileUpdateCell(autoTile, x,   y+1);
-    AutoTileUpdateCell(autoTile, x+1, y+1);
+    AutoTileUpdateCellsAround(autoTile, x -offset.x, y -offset.y);
+}
+
+void AutoTileRemoveCellResizeWorld(AutoTile *autoTile, int x, int y){
+    TilePosition tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
+    AutoTileRemoveCellResize(autoTile, tp.x, tp.y);
 }
 
 void AutoTileUpdateCell(AutoTile *autoTile, int x, int y){
@@ -219,8 +230,20 @@ void AutoTileUpdateCell(AutoTile *autoTile, int x, int y){
     
     int bitmask = AutoTileGetBitmask(autoTile, x, y);
     
-    id = autoTile->lookup[ bitmask ];
+    //reusing same variable
+    id = autoTile->id[ autoTile->lookup[bitmask] ];
     TileMapSetTile(autoTile->tileMap, x, y, id);
+}
+
+void AutoTileUpdateCellsAround(AutoTile *autoTile, int x, int y){
+    AutoTileUpdateCell(autoTile, x-1, y-1);
+    AutoTileUpdateCell(autoTile, x,   y-1);
+    AutoTileUpdateCell(autoTile, x+1, y-1);
+    AutoTileUpdateCell(autoTile, x-1, y);
+    AutoTileUpdateCell(autoTile, x+1, y);
+    AutoTileUpdateCell(autoTile, x-1, y+1);
+    AutoTileUpdateCell(autoTile, x,   y+1);
+    AutoTileUpdateCell(autoTile, x+1, y+1);
 }
 
 int GetSetBitCount(int n){
