@@ -16,4 +16,4 @@ gcc %source% -o %output% %compF% -I %raylib_src%/ -L %raylib_src% -lraylib %libF
 :: Launch exe
 %output%
 ::
-pause
+pause 
