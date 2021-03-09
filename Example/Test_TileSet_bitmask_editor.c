@@ -156,7 +156,7 @@ void Input(void){
     }
     if (drag){
         // need to move by int without float rounding loss, hence camStartPos
-        camera.target.x = camStartPos.y +(int)(( mouseStart.x -mouseCurrent.x) /scale);
+        camera.target.x = camStartPos.x +(int)(( mouseStart.x -mouseCurrent.x) /scale);
         camera.target.y = camStartPos.y +(int)(( mouseStart.y -mouseCurrent.y) /scale);
     }
     
