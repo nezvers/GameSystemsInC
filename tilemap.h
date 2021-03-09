@@ -20,13 +20,6 @@ typedef struct{
     int height;
 }TileMap;
 
-//Used for returning tile position
-//And offset caused by resizing
-typedef struct{
-    int x;
-    int y;
-}TilePosition;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
