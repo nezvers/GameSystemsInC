@@ -68,7 +68,7 @@ int *bitmask;
 
 void InitGame(void){
     
-    tileSet = TileSetNewInitFromFile("../Resource/TileSetter_template.png", 16, 16);
+    tileSet = TileSetNewInitFromFile("../Resource/TileSetter_template.png", 16, 16, NULL, 0);
     texture = LoadRenderTexture((tileSet->collumns*tileSet->tileX), (tileSet->rows*tileSet->tileY));
     col = tileSet->collumns;
     row = tileSet->rows;
@@ -93,6 +93,7 @@ void GameLoop(void){
 
 void Input(void);
 void DrawTileHighlight(void);
+Vector2 mouseTile;
 
 void DefaultScreen(){
     Input();
@@ -108,7 +109,8 @@ void DefaultScreen(){
         
         DrawTileHighlight();
         
-        DrawText("Mark direction for neighbour tiles", 20, screenHeight - 20, 20, LIGHTGRAY);
+        const char *text = TextFormat("(%f, %f)", mouseTile.x, mouseTile.y);
+        DrawText(text, 20, screenHeight - 20, 20, LIGHTGRAY);
         
     EndDrawing();
 }
@@ -127,7 +129,6 @@ void BakeTileSet(){
 Vector2 mouseCurrent;
 Vector2 mouseStart;
 Vector2 camStartPos; // needed to move by integer values;
-Vector2 mouseTile;
 bool drag = false;
 bool inArea = false;
 int bit[] = {1, 2, 4, 8, 0, 16, 32, 64, 128}; // center is 0 and is considered as active
@@ -193,6 +194,7 @@ void Input(void){
         if (bitmask[id] == 0 && b == 0){bitmask[id] = -1;}
         else{bitmask[id] &= ~b;}
     }
+    //printf("id: %d = %d (%d, %d) set %d\n", id, bitmask[id], mx, my, b);
 }
 
 void UpdateVariables(void){

@@ -70,7 +70,7 @@ int main(){
 
 void InitGame(void){
     //tileSet = TileSetNewInitFromFile("../Resource/TileSetter_template.png", 16, 16);
-    tileSet = TileSetNewInitFromFile("../Resource/grass_and_dirt_tiles.png", 16, 16);
+    tileSet = TileSetNewInitFromFile("../Resource/grass_and_dirt_tiles.png", 16, 16, NULL, 0);
     
     // tilemap for each autoTile
     tileMap1 = TileMapNew();
@@ -129,7 +129,6 @@ void Inputs(){
         autoTile = autoTile2;
     }
 }
-
 
 
 
