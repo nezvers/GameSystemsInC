@@ -56,14 +56,13 @@ int main(){
 
 RenderTexture2D texture;
 void BakeTileSet(void);
-void UpdateVariables(void);
 int scale = 2;
 int col;
 int row;
 int width;
 int height;
 Rectangle area = { 0 };
-Camera2D camera;
+Camera2D camera = { 0 };
 int *bitmask;
 
 void InitGame(void){
@@ -72,13 +71,14 @@ void InitGame(void){
     texture = LoadRenderTexture((tileSet->collumns*tileSet->tileX), (tileSet->rows*tileSet->tileY));
     col = tileSet->collumns;
     row = tileSet->rows;
+	area.width = tileSet->tileX * col;
+	area.height = tileSet->tileY * row;
     bitmask = MemAlloc(sizeof(int) * col * row);
     // set all to -1
     for (int i=0; i< col*row; i++){ bitmask[i] = -1;}
     
-    camera = (Camera2D){ 0 };
     camera.target = (Vector2){ 0.0f,0.0f } ;
-    UpdateVariables();
+	camera.zoom = scale;
     
     BakeTileSet();
     
@@ -93,7 +93,8 @@ void GameLoop(void){
 
 void Input(void);
 void DrawTileHighlight(void);
-Vector2 mouseTile;
+Vector2 mouseScreen;
+Vector2 mouseWorld;
 
 void DefaultScreen(){
     Input();
@@ -109,7 +110,7 @@ void DefaultScreen(){
         
         DrawTileHighlight();
         
-        const char *text = TextFormat("(%f, %f)", mouseTile.x, mouseTile.y);
+        const char *text = TextFormat("(%f, %f)", mouseWorld.x, mouseWorld.y);
         DrawText(text, 20, screenHeight - 20, 20, LIGHTGRAY);
         
     EndDrawing();
@@ -126,30 +127,36 @@ void BakeTileSet(){
 }
 
 
-Vector2 mouseCurrent;
-Vector2 mouseStart;
-Vector2 camStartPos; // needed to move by integer values;
-bool drag = false;
 bool inArea = false;
 int bit[] = {1, 2, 4, 8, 0, 16, 32, 64, 128}; // center is 0 and is considered as active
+
+void UpdateZoom(void);
 void PrintBitmaskData(void);
 void Input(void){
+	static Vector2 mouseStart;
+	static Vector2 camStartPos; // needed to move by integer values;
+	static bool drag = false;
+    mouseScreen = GetMousePosition();
+    
+	if (IsKeyPressed(KEY_ENTER)){PrintBitmaskData();}
     if (IsWindowResized()){
         screenWidth = GetScreenWidth();
         screenHeight = GetScreenHeight();
-        UpdateVariables();
+        UpdateZoom();
+		mouseStart = mouseScreen;
+        camStartPos = camera.target;
     }
-    if (IsKeyPressed(KEY_ENTER)){PrintBitmaskData();}
     int mWheel = GetMouseWheelMove();
     if (mWheel != 0){
         scale += mWheel;
         scale = scale > 0 ? scale : 1;
-        UpdateVariables();
+        UpdateZoom();
+		mouseStart = mouseScreen;
+        camStartPos = camera.target;
     }
-    mouseCurrent = GetMousePosition();
     if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)){
         drag = true;
-        mouseStart = mouseCurrent;
+        mouseStart = mouseScreen;
         camStartPos = camera.target;
     }
     if (IsMouseButtonReleased(MOUSE_MIDDLE_BUTTON)){
@@ -157,31 +164,31 @@ void Input(void){
     }
     if (drag){
         // need to move by int without float rounding loss, hence camStartPos
-        camera.target.x = camStartPos.x +(int)(( mouseStart.x -mouseCurrent.x) /scale);
-        camera.target.y = camStartPos.y +(int)(( mouseStart.y -mouseCurrent.y) /scale);
+        camera.target.x = camStartPos.x +(int)(( mouseStart.x -mouseScreen.x) /scale);
+        camera.target.y = camStartPos.y +(int)(( mouseStart.y -mouseScreen.y) /scale);
     }
     
     // Offset after moving camera
-    mouseTile.x = mouseCurrent.x + (camera.target.x *scale);
-    mouseTile.y = mouseCurrent.y + (camera.target.y *scale);
-    inArea = !(mouseTile.x < 0|| mouseTile.y < 0 || mouseTile.x > area.width -1 || mouseTile.y > area.height -1);
-    if (!inArea){return;}
+    mouseWorld.x = (mouseScreen.x + camera.target.x *scale) /scale;
+    mouseWorld.y = (mouseScreen.y + camera.target.y *scale) /scale;
+    inArea = !(mouseWorld.x < 0|| mouseWorld.y < 0 || mouseWorld.x > area.width -1 || mouseWorld.y > area.height -1);
+	if (!inArea){return;}
     
     //no button pressed
     if (!IsMouseButtonDown(MOUSE_LEFT_BUTTON) && !IsMouseButtonDown(MOUSE_RIGHT_BUTTON)){
         return;
     }
     
-    int w = tileSet->tileX *scale;
-    int h = tileSet->tileY *scale;
-    int x = ((int)mouseTile.x / w);
-    int y = ((int)mouseTile.y / h);
+    int w = tileSet->tileX;
+    int h = tileSet->tileY;
+    int x = ((int)mouseWorld.x / w);
+    int y = ((int)mouseWorld.y / h);
     int posX = x * w;
     int posY = y * h;
     int id = x+y*col;
     
-    int mx = ((int)mouseTile.x - posX) / (w/3);
-    int my = ((int)mouseTile.y - posY) / (h/3);
+    int mx = ((int)mouseWorld.x - posX) / (w/3);
+    int my = ((int)mouseWorld.y - posY) / (h/3);
     // Floating point imprecision on positive direction edges
     mx = mx > 2 ? 2 : mx;
     my = my > 2 ? 2 : my;
@@ -194,17 +201,13 @@ void Input(void){
         if (bitmask[id] == 0 && b == 0){bitmask[id] = -1;}
         else{bitmask[id] &= ~b;}
     }
-    //printf("id: %d = %d (%d, %d) set %d\n", id, bitmask[id], mx, my, b);
 }
 
-void UpdateVariables(void){
-    //Vector2 center = (Vector2){ screenWidth/(2.0f *scale), screenHeight/(2.0f *scale) };
-    
-    area.width = (tileSet->tileX * col) *scale;
-    area.height = (tileSet->tileY * row) *scale;
-    
-    camera.offset = (Vector2){ 0.0f,0.0f };
+void UpdateZoom(void){
+	if ((int)camera.zoom == scale){return;}
     camera.zoom = (float)scale;
+	camera.target.x = mouseWorld.x - ((float)screenWidth /2 /scale) -(mouseScreen.x - (float)screenWidth /2) /scale;
+	camera.target.y = mouseWorld.y - ((float)screenHeight /2 /scale) -(mouseScreen.y - (float)screenHeight /2) /scale;
 }
 
 
@@ -214,13 +217,13 @@ Color colorHover = LIGHTGRAY;
 
 void DrawTileHighlight(void){
     
-    int w = (int)tileSet->tileX *scale;
-    int h = (int)tileSet->tileY *scale;
+    int w = tileSet->tileX *scale;
+    int h = tileSet->tileY *scale;
     
-    int ws = w/3;
-    int hs = h/3;
-    int offX = (int)-camera.target.x *scale;
-    int offY = (int)-camera.target.y *scale;
+    float ws = (float)w/3;
+    float hs = (float)h/3;
+    int offX = -camera.target.x *scale;
+    int offY = -camera.target.y *scale;
     for (int y = 0; y < row; y++){
         for (int x = 0; x < col; x++){
             int id = x+y*col;
@@ -246,8 +249,8 @@ void DrawTileHighlight(void){
     
     //Hovered tile
     if (!inArea){return;}
-    int x = (int)(mouseTile.x / w);
-    int y = (int)(mouseTile.y / h);
+    int x = (int)(mouseWorld.x *scale / w);
+    int y = (int)(mouseWorld.y *scale/ h);
     int posX = x * w;
     int posY = y * h;
     DrawRectangleLines( posX  -1 +offX, posY -1 +offY, w +2, h +2, colorHover);
@@ -263,15 +266,5 @@ void PrintBitmaskData(void){
     }
     printf("};\n");
 }
-
-
-
-
-
-
-
-
-
-
 
 
