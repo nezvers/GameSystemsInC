@@ -1,12 +1,6 @@
 /*******************************************************************************************
-*
-*   raylib [audio] example - Module playing (streaming)
-*
-*   This example has been created using raylib 1.5 (www.raylib.com)
-*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
-*
-*   Copyright (c) 2016 Ramon Santamaria (@raysan5)
-*
+Simplified editor to create data for AutoTile bitmask list.
+Press enter to print a ready-to-use line in console.
 ********************************************************************************************/
 
 #include <stdio.h>
