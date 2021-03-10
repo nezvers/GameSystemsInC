@@ -66,8 +66,6 @@ NEZATAPI void
 AutoTileUpdateCell(AutoTile *autoTile, int x, int y);                               // Update Tilemap cell ID with new bitmask matched ID
 NEZATAPI void
 AutoTileUpdateCellsAround(AutoTile *autoTile, int x, int y);                        // Update surrounding TileMap cells
-NEZATAPI int
-GetSetBitCount(int n);                                                              // Necessary function to count how many bits ar enabled
 
 #ifdef __cplusplus
 }
@@ -79,6 +77,10 @@ GetSetBitCount(int n);                                                          
 // .c implementation / definition
 #ifdef NEZ_AUTOTILE_IMPLEMENTATION
 #undef NEZ_AUTOTILE_IMPLEMENTATION
+
+static int
+GetSetBitCount(int n);                                                              // Necessary function to count how many bits ar enabled
+
 
 AutoTile* AutoTileNew(void){
     AutoTile *autoTile = malloc(sizeof(AutoTile));
@@ -268,5 +270,4 @@ int GetSetBitCount(int n){
 }
 
 #endif //NEZ_AUTOTILE_IMPLEMENTATION
-
 
