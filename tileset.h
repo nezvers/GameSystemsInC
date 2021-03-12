@@ -40,23 +40,28 @@ extern "C" {
 #endif
 
 NEZTSAPI TileSet*
-TileSetNew();                                                                                                                   // Allocates memory and give pointer to it
+TileSetNew();                                                                                                               // Allocates memory and give pointer to it
 
 // if have custom positions on texture, give array of TilePositions otherwise NULL and positionCount = 0 or less
 NEZTSAPI TileSet*
-TileSetNewInitFromFile(const char * fileName, int tileWidth, int tileHeight, TilePosition *positionList, int positionCount);    // Allocates memory, gives pointer to it and initializes sizes
+TileSetNewInitFromFile(const char * fileName, int tileWidth, int tileHeight, TilePosition *positionList, int positionCount);// Allocates memory, gives pointer to it and initializes sizes
 NEZTSAPI TileSet*
-TileSetNewInitFromMemory(Texture texture, int tileWidth, int tileHeight, TilePosition *positionList, int positionCount);        // Allocates memory, gives pointer to it and initializes sizes
+TileSetNewInitFromMemory(Texture texture, int tileWidth, int tileHeight, TilePosition *positionList, int positionCount);    // Allocates memory, gives pointer to it and initializes sizes
 NEZTSAPI void
-TileSetDestroy(TileSet* tileSet);                                                                                               // Free allocated memory
+TileSetDestroy(TileSet* tileSet);                                                                                           // Free allocated memory
 NEZTSAPI void
-TileSetDestroyWithTexture(TileSet* tileSet);                                                                                    // Free allocated memory and unloads texture
+TileSetDestroyWithTexture(TileSet* tileSet);                                                                                // Free allocated memory and unloads texture
 NEZTSAPI void
-TileSetSetPositionList(TileSet *tileSet, TilePosition *positionList, int positionCount);                                        // Sets list of custom positions that are used to draw tiles by ID
+TileSetSetPositionList(TileSet *tileSet, TilePosition *positionList, int positionCount);                                    // Sets list of custom positions that are used to draw tiles by ID
 NEZTSAPI void
-TileSetSetSize(TileSet *tileSet, int tileWidth, int tileHeight);                                                                // Set tile size and tile IDs (Texture must be assigned)
+TileSetSetSize(TileSet *tileSet, int tileWidth, int tileHeight);                                                            // Set tile size and tile IDs (Texture must be assigned)
 NEZTSAPI void
-TileSetDrawTile(TileSet *tileSet, int id, int x, int y);                                                                        // Draws tile at given position
+TileSetDrawTile(TileSet *tileSet, int id, int x, int y);                                                                    // Draws tile at given position
+NEZTSAPI void
+TileSetDrawTileStandalone(Texture texture, int id, int x, int y, int tileCollumns, int tileWidth, int tileHeight);          // Draws tile without creating TileSet
+NEZTSAPI void
+TileSetDrawTileFromTexture(Texture texture, int x, int y, TilePosition texturePosition, int tileWidth, int tileHeight);     // Draws tile without creating TileSet, provide position on texture and tile size
+
 
 #ifdef __cplusplus
 }
@@ -142,6 +147,24 @@ void TileSetDrawTile(TileSet *tileSet, int id, int x, int y){
     }
 }
 
+void TileSetDrawTileStandalone(Texture texture, int id, int x, int y, int tileCollumns, int tileWidth, int tileHeight){
+	int col = id % tileCollumns;
+	int row = id / tileCollumns;
+	Rectangle tileRect = {(float)col * tileWidth, (float)row * tileHeight, (float)tileWidth, (float)tileHeight};
+	DrawTextureRec(texture, tileRect, (Vector2){(float)x, (float)y}, WHITE);
+}
+
+void TileSetDrawTileFromTexture(Texture texture, int x, int y, TilePosition texturePosition, int tileWidth, int tileHeight){
+	Rectangle tileRect = {(float)texturePosition.x, (float)texturePosition.y, (float)tileWidth, (float)tileHeight};
+	DrawTextureRec(texture, tileRect, (Vector2){(float)x, (float)y}, WHITE);
+}
+
 #endif //NEZ_TILESET_IMPLEMENTATION
+
+
+
+
+
+
 
 
