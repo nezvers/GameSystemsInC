@@ -124,6 +124,7 @@ void DefaultScreen(){
     BeginMode2D(camera);
         TileMapDrawGrid(tileMap1, GRAY);
         // only draw tiles that camera can see
+        // Since height color gradient should be game specific, in example it's done with transparent black rectangle between layers
         TileMapDrawExWorld(tileMap1, (int)cam.x, (int)cam.y, cam.w, cam.h);
         DrawRectangle(0, 0, screenWidth, screenHeight, (Color){0,0,0,100});
         TileMapDrawExSpreadWorld(tileMap2, (int)cam.x, (int)cam.y, cam.w, cam.h, 1.0, 1.0);
