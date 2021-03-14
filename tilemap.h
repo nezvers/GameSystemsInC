@@ -434,7 +434,13 @@ void TileMapDrawExSpreadWorld(TileMap *tileMap, int x, int y, int width, int hei
     }
     int W = (width / tileSizeX) + 1;
     int H = (height / tileSizeY) + 1;
-    TileMapDrawPartSpread(tileMap, tileMap->x, tileMap->y, X, Y, W, H, spreadX, spreadY);
+    
+    float cellOffX = (float)(distX % tileSizeX)/ tileSizeX * spreadX;
+    float cellOffY = (float)(distY % tileSizeY)/ tileSizeY * spreadY;
+    
+    int offX = -((spreadX *W) *0.5 +cellOffX -spreadX);
+    int offY = -((spreadY *H) *0.5 +cellOffY -spreadY);
+    TileMapDrawPartSpread(tileMap, tileMap->x +offX, tileMap->y +offY, X, Y, W, H, spreadX, spreadY);
 }
 
 // Can be useful to render into a RenderTexture for a single texture draw if view doesn't changes.
@@ -458,7 +464,10 @@ void TileMapDrawPart(TileMap *tileMap, int posX, int posY, int x, int y, int wid
     {
         for (int _x = x; _x < w; _x++)
         {
-            TileSetDrawTile(tileMap->tileSet, tileMap->grid[_x + _y * gridW], px + _x * sx, py + _y * sy);
+            int id = tileMap->grid[_x +_y *gridW];
+            if (id > -1){
+                TileSetDrawTile(tileMap->tileSet, tileMap->grid[_x + _y * gridW], px + _x * sx, py + _y * sy);
+            }
         }
     }
 }
@@ -476,10 +485,8 @@ void TileMapDrawPartSpread(TileMap *tileMap, int posX, int posY, int x, int y, i
 
     x = x > 0 ? x : 0;
     y = y > 0 ? y : 0;
-    int px = posX - spreadX * 0.5;
-    int py = posY - spreadY * 0.5;
-    spreadX /= width;
-    spreadY /= height;
+    int px = posX;
+    int py = posY;
     int sx = tileMap->tileSet->tileX;
     int sy = tileMap->tileSet->tileY;
     int gridW = tileMap->width;
@@ -488,7 +495,10 @@ void TileMapDrawPartSpread(TileMap *tileMap, int posX, int posY, int x, int y, i
     {
         for (int _x = x; _x < w; _x++)
         {
-            TileSetDrawTile(tileMap->tileSet, tileMap->grid[_x + _y * gridW], px + _x * sx + spreadX * _x, py + _y * sy + spreadY * _y);
+            int id = tileMap->grid[_x +_y *gridW];
+            if (id > -1){
+                TileSetDrawTile(tileMap->tileSet, id, px +_x *sx +spreadX *(_x-x), py +_y *sy +spreadY *(_y-y));
+            }
         }
     }
 }

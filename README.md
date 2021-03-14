@@ -8,6 +8,9 @@
 ![](https://github.com/nezvers/TileMap/raw/master/Resource/Preview_autotile.gif)     
 `TileMapSetTileResize(TileMap *tileMap, int x, int y, int id)`    
 ![](https://github.com/nezvers/TileMap/raw/master/Resource/Preview_TileMap_resize.gif)    
+`void TileMapDrawExSpreadWorld(TileMap *tileMap, int x, int y, int width, int height, float spreadX, float spreadY)`    
+- influenced by "Door in the Woods". requires game specific alterations for fog of war and height gradient    
+![](https://github.com/nezvers/TileMap/raw/master/Resource/Preview_TileMap_spread.gif)    
     
 Header only libraries with separate elements - tileset.h, tilemap.h, autotile.h.
 To implement .c parts need to `#define` IMPLEMENTATION guard flags before `#include` of the header file:    
