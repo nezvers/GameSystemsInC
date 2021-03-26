@@ -233,8 +233,7 @@ SpriteDraw(Sprite *sprite){
     
 	Rectangle source = {sourcePos.x, sourcePos.y, (float)sprite->w, (float)sprite->h};
     if (sprite->xScale < 0.0){
-        source.x += sprite->w;
-        source.width *= -1;
+        source.width = -(float)sprite->w;
     }
     if (sprite->yScale < 0.0){
         source.y += sprite->h;
