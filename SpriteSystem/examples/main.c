@@ -16,8 +16,8 @@
 #endif
 
 
-int screenWidth = 640;
-int screenHeight = 360;
+int screenWidth = 320;
+int screenHeight = 180;
 
 void InitGame(void);
 void GameLoop(void);
