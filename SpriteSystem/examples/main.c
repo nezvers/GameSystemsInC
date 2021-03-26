@@ -23,12 +23,15 @@ void InitGame(void);
 void GameLoop(void);
 
 Texture texture;
-Camera2D camera = {(Vector2){0}, (Vector2){0}, 0.0f, 2.0f};
+Camera2D camera = {(Vector2){0}, (Vector2){0}, 0.0f, 4.0f};
 float x;
 float y;
 Sprite *sprite;
-SpriteAnimation anim;
+SpriteAnimation idleAnim;
+SpriteAnimation walkAnim;
+int idle;
 int walk;
+int currentAnimation;
 
 //----------------------------------------------------------------------------------
 int main(){
@@ -61,10 +64,13 @@ void InitGame(){
 	sprite->x = 30;
 	sprite->y = 30;
 	
-	int list[] = {1,2,3,4,5,6};
-	anim = SpriteAnimationNew(5, list, 6);
+	int idleList[] = {0};
+	idleAnim = SpriteAnimationNew(idleList, 1, 8);
+	idle = SpriteAddAnimation(sprite, idleAnim);
 	
-	walk = SpriteAddAnimation(sprite, anim);
+	int walkList[] = {1,2,3,4,5,6};
+	walkAnim = SpriteAnimationNew(walkList, 6, 8);
+	walk = SpriteAddAnimation(sprite, walkAnim);
 	
 	x = (float)sprite->x;
 	y = (float)sprite->y;
@@ -77,13 +83,12 @@ void GameLoop(void){
 		screenHeight = GetScreenHeight();
 	}
     UpdateInput();
-	SpritePlay(sprite, walk, 1.0/60.0);
+	SpritePlay(sprite, currentAnimation, 1.0/60.0);
 	
 	BeginDrawing();
 
         ClearBackground(RAYWHITE);
 		BeginMode2D(camera);
-		
 		
 		SpriteDraw(sprite);
 		
@@ -109,23 +114,24 @@ void UpdateInput(){
 		printf("yScale: %f\n", sprite->yScale);
 	}
 	
-	
-	if(IsKeyDown(KEY_D)){
-		x += 0.2;
-		sprite->x = (int)x;
+	int xDir = (int)IsKeyDown(KEY_D) - (int)IsKeyDown(KEY_A);
+	int yDir = (int)IsKeyDown(KEY_S) - (int)IsKeyDown(KEY_W);
+    float spd = 0.4f;
+    x += spd * xDir;
+    y += spd *yDir;
+    sprite->x = (int)x;
+    sprite->y = (int)y;
+    
+	if(xDir != 0 || yDir != 0){
+		currentAnimation = walk;
 	}
-	if(IsKeyDown(KEY_A)){
-		x -= 0.2;
-		sprite->x = (int)x;
-	}
-	if(IsKeyDown(KEY_S)){
-		y += 0.2;
-		sprite->y = (int)y;
-	}
-	if(IsKeyDown(KEY_W)){
-		y -= 0.2;
-		sprite->y = (int)y;
-	}
+    else{
+        currentAnimation = idle;
+    }
+    
+    if (xDir != 0){
+        sprite->xScale = xDir;
+    }
 }
 
 

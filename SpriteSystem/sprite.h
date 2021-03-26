@@ -53,7 +53,7 @@ NEZSSAPI int
 SpriteAddAnimationList(Sprite *sprite, SpriteAnimation *anim, int animationCount);					// Adds SpriteAnimation list and returns ID for first anamation in the new list
 
 NEZSSAPI SpriteAnimation
-SpriteAnimationNew(int fps, int *imageIDList, int imageCount);
+SpriteAnimationNew(int *imageIDList, int imageCount,  int fps);
 NEZSSAPI void
 SpriteAnimationDestroy(SpriteAnimation *anim);
 
@@ -140,7 +140,12 @@ SpriteDestroy(Sprite *sprite, bool destroyAnimations){
 
 int
 SpriteAddAnimation(Sprite *sprite, SpriteAnimation anim){
-	SpriteAnimation *newList = (SpriteAnimation*)malloc(sizeof(SpriteAnimation) *(sprite->animationCount +1));
+	if(!anim.imageID){
+        printf("Invalid animation\n");
+        return -1;
+    }
+    
+    SpriteAnimation *newList = (SpriteAnimation*)malloc(sizeof(SpriteAnimation) *(sprite->animationCount +1));
 	for(int i=0; i< sprite->animationCount; i++){
 		newList[i] = sprite->animationList[i];
 	}
@@ -171,7 +176,7 @@ SpriteAddAnimationList(Sprite *sprite, SpriteAnimation *anim, int animationCount
 
 
 SpriteAnimation
-SpriteAnimationNew(int fps, int *imageIDList, int imageCount){
+SpriteAnimationNew(int *imageIDList, int imageCount,  int fps){
 	SpriteAnimation sa = {0};
 	sa.fps = fps;
 	sa.imageCount = imageCount;
@@ -197,7 +202,7 @@ SpritePlay(Sprite *sprite, int animID, float delta){
 	else{
 		sprite->animationList[animID].image += delta *sprite->animationList[animID].fps;
 		if(sprite->animationList[animID].image > sprite->animationList[animID].imageCount){
-			sprite->animationList[animID].image -= (float)sprite->animationList[animID].imageCount;
+			sprite->animationList[animID].image -= (float)(int)sprite->animationList[animID].image;
 		}
 	}
 }
@@ -211,7 +216,7 @@ SpritePlayWithCallback(Sprite *sprite, int animID, float delta, void (*Animation
 	else{
 		sprite->animationList[animID].image += delta *sprite->animationList[animID].fps;
 		if(sprite->animationList[animID].image > sprite->animationList[animID].imageCount){
-			sprite->animationList[animID].image -= (float)sprite->animationList[animID].imageCount;
+			sprite->animationList[animID].image -= (float)(int)sprite->animationList[animID].image;
 			AnimationFinished(animID);
 		}
 	}
