@@ -228,20 +228,32 @@ SpriteDraw(Sprite *sprite){
 	SpriteAnimation *anim = &sprite->animationList[sprite->animation];
 	int id = anim->imageID[(int)anim->image];
 	Vector2 sourcePos = sprite->imagePos[id];
-	Vector2 offset = (Vector2){sprite->xOrigin *SpriteAbs(sprite->xScale), sprite->yOrigin *SpriteAbs(sprite->yScale)};
 	
+	Vector2 offset = (Vector2){sprite->xOrigin *SpriteAbs(sprite->xScale), sprite->yOrigin *SpriteAbs(sprite->yScale)};
+    
+	
+    float x = sprite->x -offset.x *sprite->xScale;
+    float y = sprite->y -offset.y *sprite->yScale;
+    float w = sprite->w *SpriteAbs(sprite->xScale);
+    float h = sprite->h *SpriteAbs(sprite->yScale);
+    
     
 	Rectangle source = {sourcePos.x, sourcePos.y, (float)sprite->w, (float)sprite->h};
     if (sprite->xScale < 0.0){
         source.width = -(float)sprite->w;
+        x -= w;
     }
     if (sprite->yScale < 0.0){
         source.y += sprite->h;
         source.height *= -1;
+        y -= h;
     }
-	Rectangle dest = {sprite->x -offset.x, sprite->y -offset.y, sprite->w *SpriteAbs(sprite->xScale), sprite->h *SpriteAbs(sprite->yScale)};
 	
-	DrawTexturePro(*sprite->texture, source, dest, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+    Rectangle dest = {x, y, w, h};
+    Vector2 origin = (Vector2){ 0.0f,  0.0f};
+    float rotation = 0.0f;
+    
+	DrawTexturePro(*sprite->texture, source, dest, origin, rotation, WHITE);
 }
 
 #endif // NEZ_SPRITE_IMPLEMENTATION
