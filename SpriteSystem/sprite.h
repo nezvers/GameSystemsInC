@@ -232,8 +232,8 @@ SpriteDraw(Sprite *sprite){
 	Vector2 offset = (Vector2){sprite->xOrigin *SpriteAbs(sprite->xScale), sprite->yOrigin *SpriteAbs(sprite->yScale)};
     
 	
-    float x = sprite->x -offset.x *sprite->xScale;
-    float y = sprite->y -offset.y *sprite->yScale;
+    float x = sprite->x -offset.x;
+    float y = sprite->y -offset.y;
     float w = sprite->w *SpriteAbs(sprite->xScale);
     float h = sprite->h *SpriteAbs(sprite->yScale);
     
@@ -241,12 +241,10 @@ SpriteDraw(Sprite *sprite){
 	Rectangle source = {sourcePos.x, sourcePos.y, (float)sprite->w, (float)sprite->h};
     if (sprite->xScale < 0.0){
         source.width = -(float)sprite->w;
-        x -= w;
     }
     if (sprite->yScale < 0.0){
         source.y += sprite->h;
         source.height *= -1;
-        y -= h;
     }
 	
     Rectangle dest = {x, y, w, h};
