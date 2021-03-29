@@ -229,7 +229,7 @@ SpriteDraw(Sprite *sprite){
 	int id = anim->imageID[(int)anim->image];
 	Vector2 sourcePos = sprite->imagePos[id];
 	
-	Vector2 offset = (Vector2){sprite->xOrigin *SpriteAbs(sprite->xScale), sprite->yOrigin *SpriteAbs(sprite->yScale)};
+	Vector2 offset = (Vector2){sprite->xOrigin *sprite->xScale, sprite->yOrigin *sprite->yScale};
     
 	
     float x = sprite->x -offset.x;
@@ -241,10 +241,12 @@ SpriteDraw(Sprite *sprite){
 	Rectangle source = {sourcePos.x, sourcePos.y, (float)sprite->w, (float)sprite->h};
     if (sprite->xScale < 0.0){
         source.width = -(float)sprite->w;
+		x -= w;
     }
     if (sprite->yScale < 0.0){
         source.y += sprite->h;
         source.height *= -1;
+		y -= h;
     }
 	
     Rectangle dest = {x, y, w, h};
