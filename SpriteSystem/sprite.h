@@ -8,7 +8,7 @@
 typedef struct{
 	float image;		// used as timer (moduled to imageCount) and on drawing floored(cast as int)
 	int imageCount;		// number of images in the animation
-	int fps;		// time in seconds for each frame
+	int fps;			// time in seconds for each frame
 	int *imageID;		// array of sprite IDs
 }SpriteAnimation;
 
@@ -41,29 +41,36 @@ typedef struct{
 extern "C" {
 #endif
 
+// Automatically create sprite image collection
 NEZSSAPI Sprite*
 SpriteNewFromSheet(Texture2D *tex, int w, int h, int xO, int yO);
+// Version for predetermined frame position list array
 NEZSSAPI Sprite*
-SpriteNewFromAtlas(Texture2D *tex, int w, int h, int xO, int yO, Vector2 *posList, int posCount);		// version for predetermined frame position list array
+SpriteNewFromAtlas(Texture2D *tex, int w, int h, int xO, int yO, Vector2 *posList, int posCount);
+// Free allocated memory
 NEZSSAPI void
 SpriteDestroy(Sprite *sprite, bool destroyAnimations);
+// Adds SpriteAnimation to the Sprite and returns animation ID for it
 NEZSSAPI int
-SpriteAddAnimation(Sprite *sprite, SpriteAnimation anim);											// Adds SpriteAnimation to the Sprite and returns animation ID for it
+SpriteAddAnimation(Sprite *sprite, SpriteAnimation anim);
+// Adds SpriteAnimation list and returns ID for first anamation in the new list
 NEZSSAPI int
-SpriteAddAnimationList(Sprite *sprite, SpriteAnimation *anim, int animationCount);					// Adds SpriteAnimation list and returns ID for first anamation in the new list
-
+SpriteAddAnimationList(Sprite *sprite, SpriteAnimation *anim, int animationCount);
+// Create animation from list of sprite image collection
 NEZSSAPI SpriteAnimation
 SpriteAnimationNew(int *imageIDList, int imageCount,  int fps);
+// Free memory for animation
 NEZSSAPI void
 SpriteAnimationDestroy(SpriteAnimation *anim);
-
+// Animation update, requires delta time (seconds) since last frame. Or (1.0/60.0) for constant time of 60FPS
 NEZSSAPI void
-SpritePlay(Sprite *sprite, int animID, float delta);												// Animation update, requires delta time (seconds) since last frame. Or (1.0/60.0) for constant time of 60FPS
+SpritePlay(Sprite *sprite, int animID, float delta);
+// Animation update that can trigger callback for AnimationFinished with animation ID
 NEZSSAPI void
-SpritePlayWithCallback(Sprite *sprite, int animID, float delta, void (*AnimationFinished)(int));	// Animation update that can trigger callback for AnimationFinished with animation ID
-
+SpritePlayWithCallback(Sprite *sprite, int animID, float delta, void (*AnimationFinished)(int));
+// Just draw the sprite
 NEZSSAPI void
-SpriteDraw(Sprite *sprite);																			// Just draw the sprite
+SpriteDraw(Sprite *sprite);
 
 #ifdef __cplusplus
 }
@@ -257,6 +264,5 @@ SpriteDraw(Sprite *sprite){
 }
 
 #endif // NEZ_SPRITE_IMPLEMENTATION
-
 
 
