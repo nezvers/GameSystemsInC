@@ -6,17 +6,17 @@
 #include <stdio.h>
 
 typedef struct{
-	float image;		// used as timer (moduled to imageCount) and on drawing floored(cast as int)
-	int imageCount;		// number of images in the animation
-	int fps;			// time in seconds for each frame
-	int *imageID;		// array of sprite IDs
+	float image;        // used as timer (moduled to imageCount) and on drawing floored(cast as int)
+	int imageCount;     // number of images in the animation
+	int fps;            // time in seconds for each frame
+	int *imageID;       // array of sprite IDs
 }SpriteAnimation;
 
 typedef struct{
 	int x;
 	int y;
-	int w;				// individual sprite image width
-	int h;				// individual sprite image height
+	int w;                  // individual sprite image width
+	int h;                  // individual sprite image height
 	int xOrigin;		// origin x point against source rectangle
 	int yOrigin;		// origin y point against source rectangle
 	float xScale;		// scale output rectangle width depending on origin x position
