@@ -5,6 +5,6 @@ Super simple state machine system in C. States hold pointers to functions but th
 To implement .c parts need to `#define` IMPLEMENTATION guard flags before `#include` of the header file:    
 ```
 #define NEZ_STATEMACHINE_IMPLEMENTATION
-#include "sprite.h"
+#include "statemachine.h"
 ```
 
