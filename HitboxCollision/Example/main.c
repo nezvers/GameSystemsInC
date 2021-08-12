@@ -28,23 +28,13 @@ float spdY = 0.0f;
 int main(void)
 {
     GameInit();
-    
-
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
-
-    // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         GameUpdate();
         GameDraw();
     }
-
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
-
     return 0;
 }
 
