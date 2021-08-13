@@ -47,15 +47,15 @@ extern "C"
     TileMapGetTileWorld(TileMap *tileMap, int x, int y); // Gets tile ID using world coordinates
     NEZTMAPI void
     TileMapSetTile(TileMap *tileMap, int x, int y, int id); // Sets ID of given grid slot
-    NEZTMAPI TilePosition
+    NEZTMAPI NezVec2_i
     TileMapSetTileResize(TileMap *tileMap, int x, int y, int id); // Sets ID of given grid slot
     NEZTMAPI void
     TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom); // Moves TileMap edges by given amount
-    NEZTMAPI TilePosition
+    NEZTMAPI NezVec2_i
     TileMapTrim(TileMap *tileMap); // Resizes TileMap if there is unused outer collumns or rows
-    NEZTMAPI TilePosition
+    NEZTMAPI NezVec2_i
     TileMapWorld2Tile(TileMap *tileMap, int x, int y); // Convert world coordinates to tile coordinates
-    NEZTMAPI TilePosition
+    NEZTMAPI NezVec2_i
     TileMapTile2World(TileMap *tileMap, int x, int y); // Convert tile coordinates to world coordinates
     NEZTMAPI void
     TileMapClearGrid(TileMap *tileMap); // Remove all tile IDs (sets to -1)
@@ -167,9 +167,9 @@ void TileMapSetTile(TileMap *tileMap, int x, int y, int id)
     }
 }
 
-TilePosition TileMapSetTileResize(TileMap *tileMap, int x, int y, int id)
+NezVec2_i TileMapSetTileResize(TileMap *tileMap, int x, int y, int id)
 {
-    TilePosition offset = {0};
+    NezVec2_i offset = {0};
 
     if (id < -1 || id > tileMap->tileSet->tileCount - 1)
     {
@@ -199,10 +199,10 @@ TilePosition TileMapSetTileResize(TileMap *tileMap, int x, int y, int id)
         TileMapResize(tileMap, left, top, right, bottom);
         x -= left;
         y -= top;
-        offset = (TilePosition){left, top};
+        offset = (NezVec2_i){left, top};
         tileMap->grid[x + y * tileMap->width] = id;
     }
-    TilePosition trimOffset = TileMapTrim(tileMap);
+    NezVec2_i trimOffset = TileMapTrim(tileMap);
     offset.x += trimOffset.x;
     offset.y += trimOffset.y;
     return offset;
@@ -251,7 +251,7 @@ void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom)
     tileMap->height = h;
 }
 
-TilePosition TileMapTrim(TileMap *tileMap)
+NezVec2_i TileMapTrim(TileMap *tileMap)
 {
     // init to furthest values
 
@@ -288,7 +288,7 @@ TilePosition TileMapTrim(TileMap *tileMap)
     }
     right -= (tileMap->width - 1);
     bottom -= (tileMap->height - 1);
-    TilePosition offset = {0};
+    NezVec2_i offset = {0};
     if (left == tileMap->width - 1 && right == -(tileMap->width - 1) && top == tileMap->height - 1 && bottom == -(tileMap->height - 1))
     {
         return offset;
@@ -297,10 +297,10 @@ TilePosition TileMapTrim(TileMap *tileMap)
     {
         TileMapResize(tileMap, left, top, right, bottom);
     }
-    return (TilePosition){left, top};
+    return (NezVec2_i){left, top};
 }
 
-TilePosition TileMapWorld2Tile(TileMap *tileMap, int x, int y)
+NezVec2_i TileMapWorld2Tile(TileMap *tileMap, int x, int y)
 {
     x = (x - tileMap->x);
     y = (y - tileMap->y);
@@ -314,14 +314,14 @@ TilePosition TileMapWorld2Tile(TileMap *tileMap, int x, int y)
     }
     x = x / tileMap->tileSet->tileX;
     y = y / tileMap->tileSet->tileY;
-    return (TilePosition){x, y};
+    return (NezVec2_i){x, y};
 }
 
-TilePosition TileMapTile2World(TileMap *tileMap, int x, int y)
+NezVec2_i TileMapTile2World(TileMap *tileMap, int x, int y)
 {
     int _x = x * tileMap->tileSet->tileX + tileMap->x;
     int _y = y * tileMap->tileSet->tileY + tileMap->y;
-    return (TilePosition){_x, _y};
+    return (NezVec2_i){_x, _y};
 }
 
 void TileMapClearGrid(TileMap *tileMap)
