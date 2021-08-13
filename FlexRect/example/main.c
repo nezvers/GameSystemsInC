@@ -22,7 +22,7 @@ int screenHeight = 360;
 void InitGame(void);
 void GameLoop(void);
 
-FlexRect2 rect;
+NezRect_i rect;
 
 FlexRect *flexRect;
 FlexRect *flexChild1;
@@ -53,9 +53,9 @@ void InitGame(){
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 	InitWindow(screenWidth, screenHeight, "FlexRect test");
     
-    rect = (FlexRect2){0, 0, screenWidth, screenHeight};
+    rect = (NezRect_i){0, 0, screenWidth, screenHeight};
     flexRect = FlexRectNew(&rect, 0.0f, 0.0f, 1.0f, 1.0f, 10, 10, 10, 10, 0, 0);
-    flexChild1 = FlexRectCreateChild(flexRect, 0.0f, 0.0f, 1.0f, 0.2f, 10, 10, 10, 0, 300, 200);
+    flexChild1 = FlexRectCreateChild(flexRect, 0.0f, 0.0f, 1.0f, 0.5f, 10, 10, 10, 0, 300, 100);
 }
 
 void GameLoop(void){
@@ -82,7 +82,7 @@ void GameLoop(void){
 
 
 void Resize(){
-    rect = (FlexRect2){0, 0, screenWidth, screenHeight};
+    rect = (NezRect_i){0, 0, screenWidth, screenHeight};
     //flexRect = FlexRectNew(&rect, 0.0f, 0.0f, 1.0f, 1.0f, 10, 10, 10, 10);
     //flexChild1 = FlexRectCreateChild(flexRect, 0.0f, 0.0f, 1.0f, 0.2f, 10, 10, 10, 0);
     FlexRectResize(flexRect, &rect);
