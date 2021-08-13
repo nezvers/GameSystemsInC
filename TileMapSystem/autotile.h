@@ -194,7 +194,7 @@ void AutoTileSetCell(AutoTile *autoTile, int x, int y){
 }
 
 void AutoTileSetCellWorld(AutoTile *autoTile, int x, int y){
-    TilePosition tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
+    NezVec2_i tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
     AutoTileSetCell(autoTile, tp.x, tp.y);
 }
 
@@ -204,7 +204,7 @@ void AutoTileSetCellResize(AutoTile *autoTile, int x, int y){
     // if empty cell, then new tile has bitmask of 0
     bitmask = bitmask > -1 ? bitmask : 0;
     int id = autoTile->id[ autoTile->lookup[bitmask] ];
-    TilePosition offset = TileMapSetTileResize(autoTile->tileMap, x, y, id);
+    NezVec2_i offset = TileMapSetTileResize(autoTile->tileMap, x, y, id);
     
     
     AutoTileUpdateCellsAround(autoTile, x -offset.x, y -offset.y);
@@ -212,7 +212,7 @@ void AutoTileSetCellResize(AutoTile *autoTile, int x, int y){
 
 
 void AutoTileSetCellResizeWorld(AutoTile *autoTile, int x, int y){
-    TilePosition tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
+    NezVec2_i tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
     AutoTileSetCellResize(autoTile, tp.x, tp.y);
 }
 
@@ -223,18 +223,18 @@ void AutoTileRemoveCell(AutoTile *autoTile, int x, int y){
 }
 
 void AutoTileRemoveCellWorld(AutoTile *autoTile, int x, int y){
-    TilePosition tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
+    NezVec2_i tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
     AutoTileRemoveCell(autoTile, tp.x, tp.y);
 }
 
 void AutoTileRemoveCellResize(AutoTile *autoTile, int x, int y){
-    TilePosition offset = TileMapSetTileResize(autoTile->tileMap, x, y, -1);
+    NezVec2_i offset = TileMapSetTileResize(autoTile->tileMap, x, y, -1);
     
     AutoTileUpdateCellsAround(autoTile, x -offset.x, y -offset.y);
 }
 
 void AutoTileRemoveCellResizeWorld(AutoTile *autoTile, int x, int y){
-    TilePosition tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
+    NezVec2_i tp = TileMapWorld2Tile(autoTile->tileMap, x, y);
     AutoTileRemoveCellResize(autoTile, tp.x, tp.y);
 }
 
