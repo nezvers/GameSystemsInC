@@ -8,12 +8,14 @@
 #include "raylib.h"
 #include "stdlib.h"
 
-
+#ifndef NEZVEC2_I
+#define NEZVEC2_I
 //Used for custom positions and TileMap positions
 typedef struct{
     int x;
     int y;
-}TilePosition;
+}NezVec2_i;
+#endif // NEZVEC2_I
 
 typedef struct{
     Texture2D texture;
@@ -23,7 +25,7 @@ typedef struct{
     int rows;
     int tileCount;
     bool customPositions;   // used in TileSetDrawTile
-    TilePosition *positionList;
+    NezVec2_i *positionList;
 }TileSet;
 
 
@@ -44,15 +46,15 @@ TileSetNew();                                                                   
 
 // if have custom positions on texture, give array of TilePositions otherwise NULL and positionCount = 0 or less
 NEZTSAPI TileSet*
-TileSetNewInitFromFile(const char * fileName, int tileWidth, int tileHeight, TilePosition *positionList, int positionCount);// Allocates memory, gives pointer to it and initializes sizes
+TileSetNewInitFromFile(const char * fileName, int tileWidth, int tileHeight, NezVec2_i *positionList, int positionCount);// Allocates memory, gives pointer to it and initializes sizes
 NEZTSAPI TileSet*
-TileSetNewInitFromMemory(Texture texture, int tileWidth, int tileHeight, TilePosition *positionList, int positionCount);    // Allocates memory, gives pointer to it and initializes sizes
+TileSetNewInitFromMemory(Texture texture, int tileWidth, int tileHeight, NezVec2_i *positionList, int positionCount);    // Allocates memory, gives pointer to it and initializes sizes
 NEZTSAPI void
 TileSetDestroy(TileSet* tileSet);                                                                                           // Free allocated memory
 NEZTSAPI void
 TileSetDestroyWithTexture(TileSet* tileSet);                                                                                // Free allocated memory and unloads texture
 NEZTSAPI void
-TileSetSetPositionList(TileSet *tileSet, TilePosition *positionList, int positionCount);                                    // Sets list of custom positions that are used to draw tiles by ID
+TileSetSetPositionList(TileSet *tileSet, NezVec2_i *positionList, int positionCount);                                    // Sets list of custom positions that are used to draw tiles by ID
 NEZTSAPI void
 TileSetSetSize(TileSet *tileSet, int tileWidth, int tileHeight);                                                            // Set tile size and tile IDs (Texture must be assigned)
 NEZTSAPI void
@@ -60,7 +62,7 @@ TileSetDrawTile(TileSet *tileSet, int id, int x, int y);                        
 NEZTSAPI void
 TileSetDrawTileStandalone(Texture texture, int id, int x, int y, int tileCollumns, int tileWidth, int tileHeight);          // Draws tile without creating TileSet
 NEZTSAPI void
-TileSetDrawTileFromTexture(Texture texture, int x, int y, TilePosition texturePosition, int tileWidth, int tileHeight);     // Draws tile without creating TileSet, provide position on texture and tile size
+TileSetDrawTileFromTexture(Texture texture, int x, int y, NezVec2_i texturePosition, int tileWidth, int tileHeight);     // Draws tile without creating TileSet, provide position on texture and tile size
 
 
 #ifdef __cplusplus
@@ -77,7 +79,7 @@ TileSet*    TileSetNew(){
     return tileSet;
 }
 
-TileSet* TileSetNewInitFromFile(const char * fileName, int tileWidth, int tileHeight, TilePosition *positionList, int positionCount){
+TileSet* TileSetNewInitFromFile(const char * fileName, int tileWidth, int tileHeight, NezVec2_i *positionList, int positionCount){
     TileSet *tileSet = TileSetNew();
     tileSet->texture = LoadTexture(fileName);
     if (positionCount < 1){
@@ -92,7 +94,7 @@ TileSet* TileSetNewInitFromFile(const char * fileName, int tileWidth, int tileHe
     return tileSet;
 }
 
-TileSet* TileSetNewInitFromMemory(Texture texture, int tileWidth, int tileHeight, TilePosition *positionList, int positionCount){
+TileSet* TileSetNewInitFromMemory(Texture texture, int tileWidth, int tileHeight, NezVec2_i *positionList, int positionCount){
     TileSet *tileSet = TileSetNew();
     tileSet->texture = texture;
     if (positionCount < 1){
@@ -117,9 +119,9 @@ void TileSetDestroyWithTexture(TileSet* tileSet){
     TileSetDestroy(tileSet);
 }
 
-void TileSetSetPositionList(TileSet *tileSet, TilePosition *positionList, int positionCount){
+void TileSetSetPositionList(TileSet *tileSet, NezVec2_i *positionList, int positionCount){
     tileSet->customPositions = true;
-    tileSet->positionList = (TilePosition*)malloc(sizeof(TilePosition) * positionCount);
+    tileSet->positionList = (NezVec2_i*)malloc(sizeof(NezVec2_i) * positionCount);
     for(int i=0; i<positionCount; i++){
         tileSet->positionList[i] = positionList[i];
     }
@@ -154,17 +156,10 @@ void TileSetDrawTileStandalone(Texture texture, int id, int x, int y, int tileCo
 	DrawTextureRec(texture, tileRect, (Vector2){(float)x, (float)y}, WHITE);
 }
 
-void TileSetDrawTileFromTexture(Texture texture, int x, int y, TilePosition texturePosition, int tileWidth, int tileHeight){
+void TileSetDrawTileFromTexture(Texture texture, int x, int y, NezVec2_i texturePosition, int tileWidth, int tileHeight){
 	Rectangle tileRect = {(float)texturePosition.x, (float)texturePosition.y, (float)tileWidth, (float)tileHeight};
 	DrawTextureRec(texture, tileRect, (Vector2){(float)x, (float)y}, WHITE);
 }
 
 #endif //NEZ_TILESET_IMPLEMENTATION
-
-
-
-
-
-
-
 
