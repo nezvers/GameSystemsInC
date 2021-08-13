@@ -6,13 +6,26 @@
 #include "stdlib.h"
 #include "stdio.h"
 
+// Flags for expanding in case parent rect is smaller than minimal size
+enum {
+    FR_RIGHT    = 0, // grow rigth
+    FR_LEFT     = 1, // grow left
+    FR_H_CENTER = 2, // grow centered
+    FR_DOWN     = 0, // grow down
+    FR_UP       = 1, // grow up
+    FR_V_CENTER = 2, // grow centered
+};
+
+#ifndef NEZRECT_I
+#define NEZRECT_I
 // Basic rectangle struct with x & y fosition and w & h size
 typedef struct{
     int x;
     int y;
     int w;
     int h;
-}FlexRect2;
+}NezRect_i;
+#endif // NEZRECT_I
 
 // Flexible rectangle that positions self depending on it's parameters
 typedef struct FlexRect FlexRect;
@@ -30,9 +43,9 @@ typedef struct FlexRect FlexRect;
 extern "C" {
 #endif
 
-// Create new FlexRect providing FlexRect2 rectangle, anchor percentage from sides and margin pixels from sides and minimal width & height.
+// Create new FlexRect providing NezRect_i rectangle, anchor percentage from sides and margin pixels from sides and minimal width & height.
 NEZFRAPI FlexRect* 
-FlexRectNew(FlexRect2 *rect, float al, float at, float ar, float ab, int ml, int mt, int mr, int mb, int minw, int minh);
+FlexRectNew(NezRect_i *rect, float al, float at, float ar, float ab, int ml, int mt, int mr, int mb, int minw, int minh);
 // Deallocate FlexRect and it's children
 NEZFRAPI void
 FlexRectDestroy(FlexRect *rect);
@@ -47,7 +60,7 @@ NEZFRAPI void
 FlexRectDestroyChild(FlexRect *parent, FlexRect *child);
 // Give new rectangle are to resize it and it's children
 NEZFRAPI void
-FlexRectResize(FlexRect *fr, FlexRect2 *rect);
+FlexRectResize(FlexRect *fr, NezRect_i *rect);
 // FlexRectSetFlags();
 // FlexRectWithPoint(FlexRect *rect);
 
@@ -72,21 +85,21 @@ struct FlexRect{
     int mb;          // margin bottom
     int minw;        // minimal width
     int minh;        // minimal height
-    FlexRect2 r;     // rectangle area
+    NezRect_i r;     // rectangle area
     int childCount;
     FlexRect **children;
     FlexRect *parent;
 };
 
-FlexRect2
-FlexRectGetRect(FlexRect2 *rect, float al, float at, float ar, float ab, int ml, int mt, int mr, int mb, int minw, int minh){
+NezRect_i
+FlexRectGetRect(NezRect_i *rect, float al, float at, float ar, float ab, int ml, int mt, int mr, int mb, int minw, int minh){
     int x = rect->x + (rect->w * al) + ml;
     int y = rect->y + (rect->h * at) + mt;
     int w = (rect->w - (rect->w * al) - ml - mr) * ar;
     int h = (rect->h - (rect->h * at) - mt - mb) * ab;
     if (w < minw){w = minw;}
     if (h < minh){h = minh;}
-    FlexRect2 r = {
+    NezRect_i r = {
         x,
         y,
         w,
@@ -97,8 +110,8 @@ FlexRectGetRect(FlexRect2 *rect, float al, float at, float ar, float ab, int ml,
 
 
 FlexRect* 
-FlexRectNew(FlexRect2 *rect, float al, float at, float ar, float ab, int ml, int mt, int mr, int mb, int minw, int minh){
-    FlexRect2 r = FlexRectGetRect(rect, al, at, ar, ab, ml, mt, mr, mb, minw, minh);
+FlexRectNew(NezRect_i *rect, float al, float at, float ar, float ab, int ml, int mt, int mr, int mb, int minw, int minh){
+    NezRect_i r = FlexRectGetRect(rect, al, at, ar, ab, ml, mt, mr, mb, minw, minh);
     
     FlexRect* fr = malloc(sizeof(FlexRect));
     *fr = (FlexRect){
@@ -174,7 +187,7 @@ FlexRectDestroyChild(FlexRect *parent, FlexRect *child){
 }
 
 void
-FlexRectResize(FlexRect *fr, FlexRect2 *rect){
+FlexRectResize(FlexRect *fr, NezRect_i *rect){
     fr->r = FlexRectGetRect(rect, fr->al, fr->at, fr->ar, fr->ab, fr->ml, fr->mt, fr->mr, fr->mb, fr->minw, fr->minh);
     for(int i = 0 ; i < fr->childCount; i++){
         FlexRectResize(fr->children[i], &fr->r);
