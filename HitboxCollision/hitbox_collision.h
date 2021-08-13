@@ -6,13 +6,15 @@
 #include "stdlib.h"
 #include "stdbool.h"
 
+#ifndef NEZRECT_F
+#define NEZRECT_F
 typedef struct {
     float x;    // origin x
     float y;    // origin y
     float w;    // width
     float h;    // height
-} Hitbox;
-
+} NezRect_f;
+#endif // NEZRECT_F
 
 #ifndef NEZHBAPI
     #ifdef NEZ_HITBOX_STATIC
@@ -28,10 +30,10 @@ extern "C" {
 
     // Check if two hitboxes collides
     NEZHBAPI bool
-        HitboxCheckHitbox(Hitbox *a, Hitbox *b);
+        HitboxCheckHitbox(NezRect_f *a, NezRect_f *b);
     // Get remaining move distance after collision check. Internally calls HitboxCheckHitbox()
     NEZHBAPI void
-        HitboxMoveAndCollideHitbox(Hitbox *a, Hitbox *b, float *spdX, float *spdY);
+        HitboxMoveAndCollideHitbox(NezRect_f *a, NezRect_f *b, float *spdX, float *spdY);
 
 
 
@@ -43,13 +45,13 @@ extern "C" {
 #ifdef HITBOX_COLLISIONS_IMPLEMENTATION
 #undef HITBOX_COLLISIONS_IMPLEMENTATION
 
-bool HitboxCheckHitbox(Hitbox *a, Hitbox *b) {
+bool HitboxCheckHitbox(NezRect_f *a, NezRect_f *b) {
     return  a->x < b->x + b->w && a->x + a->w > b->x && a->y< b->y + b->h && a->y + a->h > b->y;
 }
 
 
-void HitboxMoveAndCollideHitbox(Hitbox *a, Hitbox *b, float *spdX, float *spdY) {
-    Hitbox c = (Hitbox){a->x + *spdX, a->y, a->w, a->h};
+void HitboxMoveAndCollideHitbox(NezRect_f *a, NezRect_f *b, float *spdX, float *spdY) {
+    NezRect_f c = (NezRect_f){a->x + *spdX, a->y, a->w, a->h};
 
     if (HitboxCheckHitbox(&c, b)) {
         if (*spdX > 0.0f) {
