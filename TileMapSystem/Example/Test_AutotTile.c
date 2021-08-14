@@ -14,12 +14,12 @@
 #include "stdio.h"
 
 #define NEZ_AUTOTILE_IMPLEMENTATION
-#include "../autotile.h"
+#include "autotile.h"
 #define NEZ_TILEMAP_IMPLEMENTATION
-#include "../tilemap.h"
+#include "tilemap.h"
 #define NEZ_TILESET_IMPLEMENTATION
-#include "../tileset.h"
-#include "../Resource/TileSetBitmask.h"
+#include "tileset.h"
+#include "Resource/TileSetBitmask.h"
 
 int screenWidth = 480;
 int screenHeight = 240;

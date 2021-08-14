@@ -7,7 +7,7 @@
 #include "raylib.h"
 
 #define NEZ_FLEXRECT_IMPLEMENTATION
-#include "../flexrect.h"
+#include "flexrect.h"
 
 //#define PLATFORM_WEB
 

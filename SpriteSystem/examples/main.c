@@ -7,7 +7,7 @@
 #include "raylib.h"
 
 #define NEZ_SPRITE_IMPLEMENTATION
-#include "../sprite.h"
+#include "sprite.h"
 
 //#define PLATFORM_WEB
 

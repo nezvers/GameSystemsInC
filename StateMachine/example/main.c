@@ -1,7 +1,7 @@
 #include "stdio.h"
 
 #define NEZ_STATEMACHINE_IMPLEMENTATION
-#include "../statemachine.h"
+#include "statemachine.h"
 
 int testVar = 0;
 

@@ -6,7 +6,7 @@ Press enter to print a ready-to-use line in console.
 #include <stdio.h>
 #include "raylib.h"
 #define NEZ_TILESET_IMPLEMENTATION
-#include "../tileset.h"
+#include "tileset.h"
 
 int screenWidth = 480;
 int screenHeight = 240;

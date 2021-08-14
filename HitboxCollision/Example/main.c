@@ -4,7 +4,7 @@
 #include "math.h"
 
 #define HITBOX_COLLISIONS_IMPLEMENTATION
-#include "../hitbox_collision.h"
+#include "hitbox_collision.h"
 
 const int screenWidth = 800;
 const int screenHeight = 600;

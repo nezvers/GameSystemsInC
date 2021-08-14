@@ -1,16 +1,15 @@
 OUTPUT=main
 CC=gcc
 RAYLIB=../../raylib
+INCLUDE=-I$(RAYLIB) -I../
 CFLAGS=-Wall -std=c99 -Wno-missing-braces
-LFLAGS=-I$(RAYLIB) -L$(RAYLIB) -lraylib -lopengl32 -lgdi32 -lwinmm
+LFLAGS=$(INCLUDE) -L$(RAYLIB) -lraylib -lopengl32 -lgdi32 -lwinmm
 
 all: main
 
 main: main.c
-	$(CC) $(CFLAGS) -o $(OUTPUT).exe $^ $(RAYLIB)/raylib.rc.data $(LFLAGS)
+	$(CC) $(CFLAGS) -o $(OUTPUT).exe $^ $(LFLAGS)
 
-%.o: %.c %.h
-	$(CC) $(CFLAGS) -c $^
 
 clean:
 	del *.o $(OUTPUT).exe
