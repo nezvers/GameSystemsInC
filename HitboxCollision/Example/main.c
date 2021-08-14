@@ -13,38 +13,27 @@ void GameInit();
 void GameUpdate();
 void GameDraw();
 
-#define SOLID_COUNT 4
+#define SOLID_COUNT 6
 NezRect_f solids[] = {
-    {200.0f, 200.0f, 16.0f, 16.0f},
-    {216.0f, 184.0f, 16.0f, 16.0f},
-    {224.0f, 168.0f, 16.0f, 16.0f},
-    {232.0f, 152.0f, 16.0f, 16.0f},
+    {192.0f, 454.0f, 96.0f, 32.0f},
+    {384.0f, 358.0f, 128.0f, 32.0f},
+    {64.0f, 268.0f, 96.0f, 32.0f},
+    {0.0f, 550.0f, 800.0f, 50.0f},// floor
+    {-18.0f, 0.0f, 32.0f, 600.0f},// left wall
+    {782.0f, 0.0f, 32.0f, 600.0f},// right wall
 };
-NezRect_f player = {100.0f, 100.0f, 16.0, 16.0f};
+NezRect_f player = {100.0f, 100.0f, 32.0, 32.0f};
 
-float spdX = 0.0f;
-float spdY = 0.0f;
 
-int main(void)
-{
+
+int main(void){
     GameInit();
-    
-
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
-
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
+    SetTargetFPS(60);
+    while (!WindowShouldClose()){
         GameUpdate();
         GameDraw();
     }
-
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
-
+    CloseWindow();
     return 0;
 }
 
@@ -53,27 +42,71 @@ void GameInit() {
 }
 
 
-void GameUpdate() {
-    spdX = (float)(IsKeyDown(KEY_D) - IsKeyDown(KEY_A)) * 2.0f;
-    spdY = (float)(IsKeyDown(KEY_S) - IsKeyDown(KEY_W)) * 2.0f;
-    for (int i = 0; i < SOLID_COUNT; i++) {
+void GameUpdate(){
+    // VARIABLES
+    static const float maxX = 6.0f;
+    static const float jumpSpd = -10.0f;
+    static const float grav = 0.4f;
+    static const float acc = 0.1;
+    static float spdX = 0.0f;
+    static float spdY = 0.0f;
+    static bool isGrounded = false;
+    static int dirX = 0;
+    
+    // INPUT DIRECTION
+    dirX = (float)(IsKeyDown(KEY_D) - IsKeyDown(KEY_A));
+    
+    // HORIZONTAL SPEED
+    spdX += (dirX * maxX - spdX) * acc;
+    if (spdX < -maxX){
+        spdX = -maxX;
+    }
+    else if (spdX > maxX){
+        spdX = maxX;
+    }
+    
+    // VERTICAL SPEED
+    if (isGrounded && IsKeyPressed(KEY_SPACE)){
+        spdY = jumpSpd;
+    }
+    else{
+        spdY += grav;
+    }
+    if (spdY > -jumpSpd){
+        spdY = -jumpSpd;
+    }
+    float prevY = spdY;
+    
+    // COLLISION
+    for (int i = 0; i < SOLID_COUNT; i++){
         HitboxMoveAndCollideHitbox(&player, &solids[i], &spdX, &spdY);
     }
+    
+    // GROUND CHECK
+    if (prevY > 0.0f && spdY <= 0.0f){
+        isGrounded = true;
+    }
+    else{
+        isGrounded = false;
+    }
+    
+    // POSITION
     player.x += spdX;
     player.y += spdY;
 }
 
 
-void GameDraw() {
+void GameDraw(){
     BeginDrawing();
-
     ClearBackground(RAYWHITE);
-
+    
+    // PLAYER
     DrawRectangle((int)player.x, (int)player.y, (int)player.w, (int)player.h, BLUE);
+    
+    // SOLIDS
     for (int i = 0; i < SOLID_COUNT; i++) {
         DrawRectangle((int)solids[i].x, (int)solids[i].y, (int)solids[i].w, (int)solids[i].h, RED);
     }
-    
 
     EndDrawing();
 }
