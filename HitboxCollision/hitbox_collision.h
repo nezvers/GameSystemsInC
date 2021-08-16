@@ -78,8 +78,8 @@ void HitboxMoveAndCollideHitbox(NezRect_f *a, NezRect_f *b, float *spdX, float *
 // Test if movement direction can result with collision
 bool HitboxMoveCollisionCheck(NezRect_f *a, NezRect_f *b, float *spdX, float *spdY) {
     float d = (float)sqrt(*spdX * *spdX + *spdY * *spdY);
-    float projX = *spdX / d;
-    float projY = *spdY / d;
+    float projX = -*spdY / d;
+    float projY = *spdX / d;
     
     float min_r1 = INFINITY;
     float max_r1 = -INFINITY;
