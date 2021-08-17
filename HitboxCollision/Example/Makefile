@@ -7,7 +7,7 @@ LFLAGS=$(INCLUDE) -L$(RAYLIB) -lraylib -lopengl32 -lgdi32 -lwinmm
 
 all: main
 
-main: main.c
+main: $(OUTPUT).c
 	$(CC) $(CFLAGS) -o $(OUTPUT).exe $^ $(LFLAGS)
 
 

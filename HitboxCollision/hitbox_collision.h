@@ -1,3 +1,8 @@
+/*
+    Many implementations are taken from Javidx9 / OneLoneCoder 
+    https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/Videos/OneLoneCoder_PGE_Rectangles.cpp
+*/
+
 #ifndef HITBOX_COLLISIONS_H
 #define HITBOX_COLLISIONS_H
 
@@ -17,6 +22,14 @@ typedef struct {
 } NezRect_f;
 #endif // NEZRECT_F
 
+#ifndef NEZVEC2_F
+#define NEZVEC2_F
+typedef struct {
+    float x;
+    float y;
+} NezVec2_f;
+#endif // NEZVEC2_F
+
 #ifndef NEZHBAPI
     #ifdef NEZ_HITBOX_STATIC
         #define NEZHBAPI static
@@ -35,8 +48,15 @@ extern "C" {
     // Get remaining move distance after collision check. Internally calls HitboxCheckHitbox()
     NEZHBAPI void
         HitboxMoveAndCollideHitbox(NezRect_f *a, NezRect_f *b, float *spdX, float *spdY);
-
-
+    // Check if movement axis can result in collision. Using Separated Axis Theorem.
+    NEZHBAPI bool
+        HitboxAxisCollisionCheck(NezRect_f *a, NezRect_f *b, float *dirX, float *dirY);
+    // Raycast against rectangle
+    NEZHBAPI bool
+        HitboxVsRaycast(NezVec2_f *rayOrig, NezVec2_f *rayDir, NezRect_f *target, NezVec2_f *colPoint, NezVec2_f *colNormal, float *timeStep);
+    // Dynamic rectangle vs rectangle collision. Velocity gets multiplied by deltaTime. Pass deltaTime value of 1.0f if full velocity length should be performed.
+    NEZHBAPI bool
+        HitboxDynamicVsHitbox(NezRect_f *movingRect, NezVec2_f *velocity, float *deltaTime, NezRect_f *target, NezVec2_f *colPoint, NezVec2_f *colNormal, float *timeStep);
 
 #ifdef __cplusplus
 }
@@ -45,6 +65,13 @@ extern "C" {
 
 #ifdef HITBOX_COLLISIONS_IMPLEMENTATION
 #undef HITBOX_COLLISIONS_IMPLEMENTATION
+
+static inline void swapf(float *a, float *b){
+   float t;
+   t  = *b;
+   *b = *a;
+   *a = t;
+}
 
 bool HitboxCheckHitbox(NezRect_f *a, NezRect_f *b) {
     return  a->x < b->x + b->w && a->x + a->w > b->x && a->y< b->y + b->h && a->y + a->h > b->y;
@@ -75,11 +102,11 @@ void HitboxMoveAndCollideHitbox(NezRect_f *a, NezRect_f *b, float *spdX, float *
     }
 }
 
-// Test if movement direction can result with collision
-bool HitboxMoveCollisionCheck(NezRect_f *a, NezRect_f *b, float *spdX, float *spdY) {
-    float d = (float)sqrt(*spdX * *spdX + *spdY * *spdY);
-    float projX = -*spdY / d;
-    float projY = *spdX / d;
+
+bool HitboxAxisCollisionCheck(NezRect_f *a, NezRect_f *b, float *dirX, float *dirY) {
+    float d = (float)sqrt(*dirX * *dirX + *dirY * *dirY);
+    float projX = -*dirY / d;
+    float projY = *dirX / d;
     
     float min_r1 = INFINITY;
     float max_r1 = -INFINITY;
@@ -107,6 +134,76 @@ bool HitboxMoveCollisionCheck(NezRect_f *a, NezRect_f *b, float *spdX, float *sp
         return false;
     }else{
         return true;
+    }
+}
+
+bool HitboxVsRaycast(NezVec2_f *rayOrig, NezVec2_f *rayDir, NezRect_f *target, NezVec2_f *colPoint, NezVec2_f *colNormal, float *timeStep){
+    *colNormal = (NezVec2_f){0.0f, 0.0f};
+    *colPoint = (NezVec2_f){0.0f, 0.0f};
+    
+    // Cache division
+    NezVec2_f invdir = (NezVec2_f){1.0f / rayDir->x, 1.0f / rayDir->y};
+    
+    // Calculate intersections with rectangle bounding axes
+    NezVec2_f t_near = (NezVec2_f){(target->x - rayOrig->x) * invdir.x, (target->y - rayOrig->y) * invdir.y};
+    NezVec2_f t_far = (NezVec2_f){(target->x + target->w - rayOrig->x) * invdir.x, (target->y + target->h - rayOrig->y) * invdir.y};
+    if (isinf(t_near.x) || isinf(t_near.y)){return false;}
+    if (isinf(t_far.x) || isinf(t_far.y)){return false;}
+    
+    // Sort distance
+    if (t_near.x > t_far.x) swapf(&t_near.x, &t_far.x);
+    if (t_near.y > t_far.y) swapf(&t_near.y, &t_far.y);
+    
+    // Early rejection
+    if (t_near.x > t_far.y || t_near.y > t_far.x) {return false;}
+    
+    // Closest 'time' will be the first contact
+    *timeStep = fmaxf(t_near.x, t_near.y);
+    
+    // Furthest 'time' is contact on opposite side of target
+    float t_hit_far = fminf(t_far.x, t_far.y);
+    
+    // Reject if ray direction is pointing away from object
+    if (t_hit_far < 0){return false;}
+    
+    // Contact point of collision from parametric line equation
+    *colPoint = (NezVec2_f){rayOrig->x + *timeStep * rayDir->x, rayOrig->y + *timeStep * rayDir->y};
+    
+    if (t_near.x > t_near.y){
+        if (invdir.x < 0){
+            *colNormal = (NezVec2_f){ 1.0f, 0.0f };
+        }else{
+            *colNormal = (NezVec2_f){ -1.0f, 0.0f };
+        }
+    }
+    
+    // Note if t_near == t_far, collision is principly in a diagonal
+    // so pointless to resolve. By returning a CN={0,0} even though its
+    // considered a hit, the resolver wont change anything.
+    
+    return true;
+}
+
+bool HitboxDynamicVsHitbox(NezRect_f *movingRect, NezVec2_f *velocity, float *deltaTime, NezRect_f *target, NezVec2_f *colPoint, NezVec2_f *colNormal, float *timeStep){
+    // Check if dynamic rectangle is actually moving - we assume rectangles are NOT in collision to start
+    if (velocity->x == 0.0f && velocity->y == 0.0f){return false;}
+    
+    // Expand target rectangle by source dimensions
+    NezRect_f expanded_target = (NezRect_f){
+        target->x - movingRect->w * 0.5,
+        target->y - movingRect->h * 0.5,
+        target->w + movingRect->w,
+        target->h + movingRect->h,
+    };
+    NezVec2_f rayOrigin = {movingRect->x + movingRect->w * 0.5, movingRect->y + movingRect->h * 0.5};
+    NezVec2_f rayDir = {velocity->x * *deltaTime, velocity->y * *deltaTime};
+    
+    
+    if (HitboxVsRaycast(&rayOrigin, &rayDir, &expanded_target, colPoint, colNormal, timeStep)){
+        return (*timeStep >= 0.0f && *timeStep < 1.0f);
+    }
+    else{
+        return false;
     }
 }
 

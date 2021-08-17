@@ -6,8 +6,6 @@
 #define HITBOX_COLLISIONS_IMPLEMENTATION
 #include "hitbox_collision.h"
 
-// testing forward declaring
-bool HitboxMoveCollisionCheck(NezRect_f *a, NezRect_f *b, float *spdX, float *spdY);
 
 const int screenWidth = 800;
 const int screenHeight = 600;
@@ -49,9 +47,17 @@ void GameUpdate(){
         rect2.x = mouse.x;
         rect2.y = mouse.y;
     }
-    float x = mouse.x - rect1.x;
-    float y = mouse.y - rect1.y;
-    isColliding = HitboxMoveCollisionCheck(&rect1, &rect2, &x, &y);
+    //NezVec2_f rayOrig = {rect1.x, rect1.y};
+    NezVec2_f rayDir = {mouse.x - rect1.x, mouse.y - rect1.y};
+    NezVec2_f cp;
+    NezVec2_f cn;
+    float dt = 1.0f;
+    float t;
+    //isColliding = HitboxVsRaycast(&rayOrig, &rayDir, &rect2, &cp, &cn, &t);
+    isColliding = HitboxDynamicVsHitbox(&rect1, &rayDir, &dt, &rect2, &cp, &cn, &t);
+    // printf("Time of impact: %.4f\n", t);
+    // printf("Colision point: (%.2f, %.2f)\n", cp.x, cp.y);
+    // printf("Colision normal: (%.2f, %.2f)\n", cn.x, cn.y);
 }
 
 
