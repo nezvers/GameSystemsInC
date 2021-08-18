@@ -51,10 +51,8 @@ void GameUpdate(){
     NezVec2_f rayDir = {mouse.x - rect1.x, mouse.y - rect1.y};
     NezVec2_f cp;
     NezVec2_f cn;
-    float dt = 1.0f;
     float t;
-    //isColliding = HitboxVsRaycast(&rayOrig, &rayDir, &rect2, &cp, &cn, &t);
-    isColliding = HitboxDynamicVsHitbox(&rect1, &rayDir, &dt, &rect2, &cp, &cn, &t);
+    isColliding = HitboxDynamicVsHitbox(&rect1, &rayDir, &rect2, &cp, &cn, &t);
     // printf("Time of impact: %.4f\n", t);
     // printf("Colision point: (%.2f, %.2f)\n", cp.x, cp.y);
     // printf("Colision normal: (%.2f, %.2f)\n", cn.x, cn.y);
