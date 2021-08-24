@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include "math.h"
 
-#define VIEWPOR_SCALING_IMPLEMENTATION
+#define VIEWPORT_SCALING_IMPLEMENTATION
 #include "viewport_scaling.h"
 
 void GameInit();
