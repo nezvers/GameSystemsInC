@@ -75,8 +75,8 @@ extern "C" {
 #endif
 #endif //VIEWPOR_SCALING_H
 
-#ifdef VIEWPOR_SCALING_IMPLEMENTATION
-#undef VIEWPOR_SCALING_IMPLEMENTATION
+#ifdef VIEWPORT_SCALING_IMPLEMENTATION
+#undef VIEWPORT_SCALING_IMPLEMENTATION
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
@@ -167,5 +167,5 @@ void ViewportKeepWidth(NezRect_f *view, NezRect_f *screen, int *viewWidth, int *
     screen->y = (*windowHeight - screen->h) / 2;
 }
 
-#endif //VIEWPOR_SCALING_IMPLEMENTATION
+#endif //VIEWPORT_SCALING_IMPLEMENTATION
 
