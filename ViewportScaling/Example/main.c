@@ -72,12 +72,12 @@ void UpdateResolution(){
 void GameDraw(){
     const Vector2 orig = (Vector2){0.0f, 0.0f};
     const char* modes[] = {
-        "Keep aspect (pixel)",
-        "Keep height (pixel)",
-        "Keep width (pixel)",
-        "Keep aspect",
-        "Keep height",
-        "Keep width",
+        "Keep aspect (pixel) \nTAB to change",
+        "Keep height (pixel) \nTAB to change",
+        "Keep width (pixel) \nTAB to change",
+        "Keep aspect \nTAB to change",
+        "Keep height \nTAB to change",
+        "Keep width \nTAB to change",
     };
     BeginTextureMode(viewport);
         DrawScene();
