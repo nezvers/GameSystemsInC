@@ -1,0 +1,107 @@
+#include "raylib.h"
+#include "math.h"
+
+#define VIEWPOR_SCALING_IMPLEMENTATION
+#include "viewport_scaling.h"
+
+void GameInit();
+void GameUpdate();
+void GameDraw();
+void UpdateResolution();
+void DrawScene();
+
+int gameWidth = 320;
+int gameHeight = 180;
+int screenWidth = 320;
+int screenHeight = 180;
+RenderTexture viewport;
+Rectangle viewRect;
+Rectangle screenRect;
+
+void (*scaler[6])(Rectangle*, Rectangle*, int*, int*, int*, int*);
+int funcIndex = 0;
+
+int main(void){
+    GameInit();
+    SetTargetFPS(60);
+    while (!WindowShouldClose()){
+        GameUpdate();
+        GameDraw();
+    }
+    CloseWindow();
+    return 0;
+}
+
+void GameInit() {
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(screenWidth, screenHeight, "2D viewport scaling");
+    scaler[0] = ViewportKeepAspectPixel;
+    scaler[1] = ViewportKeepHeightPixel;
+    scaler[2] = ViewportKeepWidthPixel;
+    scaler[3] = ViewportKeepAspect;
+    scaler[4] = ViewportKeepHeight;
+    scaler[5] = ViewportKeepWidth;
+    UpdateResolution();
+}
+
+void GameUpdate(){
+    // change scaling function
+    if (IsKeyPressed(KEY_TAB)){
+        funcIndex = (funcIndex + 1) % 6;
+        UpdateResolution();
+    }
+    if (IsWindowResized()){
+        screenWidth = GetScreenWidth();
+        screenHeight = GetScreenHeight();
+        UpdateResolution();
+    }
+}
+
+void UpdateResolution(){
+    scaler[funcIndex](&viewRect, &screenRect, &gameWidth, &gameHeight, &screenWidth, &screenHeight);
+    
+    // Change resolution for RenderTexture
+    UnloadRenderTexture(viewport);
+    viewport = LoadRenderTexture((int)viewRect.width, (int)viewRect.height);
+    
+    // RenderTexture needs to be flipped
+    viewRect.y = -viewRect.height;
+    viewRect.height *= -1;
+}
+
+void GameDraw(){
+    const Vector2 orig = (Vector2){0.0f, 0.0f};
+    const char* modes[] = {
+        "Keep aspect (pixel)",
+        "Keep height (pixel)",
+        "Keep width (pixel)",
+        "Keep aspect",
+        "Keep height",
+        "Keep width",
+    };
+    BeginTextureMode(viewport);
+        DrawScene();
+     EndTextureMode();
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+        DrawTexturePro(viewport.texture, viewRect, screenRect, orig, 0.0f, WHITE);
+        DrawRectangleLinesEx(screenRect, 1, BLACK);
+        
+        DrawText(modes[funcIndex], 7, 8, 16, WHITE);
+        DrawText(modes[funcIndex], 9, 8, 16, WHITE);
+        DrawText(modes[funcIndex], 8, 7, 16, WHITE);
+        DrawText(modes[funcIndex], 8, 9, 16, WHITE);
+        DrawText(modes[funcIndex], 8, 8, 16, BLACK);
+    EndDrawing();
+}
+
+void DrawScene(){
+    DrawRectangleLines(0, 0, gameWidth, gameHeight, GOLD);
+    DrawLine(0,0,gameWidth, gameHeight, LIGHTGRAY);
+    DrawLine(gameWidth,0, 0, gameHeight, LIGHTGRAY);
+    for (int i = 0; i < 20; i++){
+        int m = 10;
+        DrawRectangleLines(0 - m * i, 0 - m * i, gameWidth + m * 2 * i, gameHeight + m * 2 * i, LIGHTGRAY);
+    }
+}
+
