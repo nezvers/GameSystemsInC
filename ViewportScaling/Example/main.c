@@ -28,6 +28,7 @@ int main(void){
         GameUpdate();
         GameDraw();
     }
+    UnloadRenderTexture(viewport);
     CloseWindow();
     return 0;
 }
