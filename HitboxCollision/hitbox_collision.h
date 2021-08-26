@@ -12,33 +12,24 @@
 #include "stdbool.h"
 #include "math.h"
 
-#if defined RAYLIB_H
-    #define NezRect_f Rectangle
-    #define w width
-    #define h height
-#else
-    #ifndef NEZRECT_F
-    #define NEZRECT_F
-    typedef struct {
-        float x;    // origin x
-        float y;    // origin y
-        float w;    // width
-        float h;    // height
-    } NezRect_f;
-    #endif // NEZRECT_F
-#endif
+#ifndef NEZRECT_F
+#define NEZRECT_F
+typedef struct {
+    float x;    // origin x
+    float y;    // origin y
+    float w;    // width
+    float h;    // height
+} NezRect_f;
+#endif // NEZRECT_F
 
-#if defined RAYLIB_H
-    #define NezVec2_f Vector2
-#else
-    #ifndef NEZVEC2_F
-    #define NEZVEC2_F
-    typedef struct {
-        float x;
-        float y;
-    } NezVec2_f;
-    #endif // NEZVEC2_F
-#endif
+
+#ifndef NEZVEC2_F
+#define NEZVEC2_F
+typedef struct {
+    float x;
+    float y;
+} NezVec2_f;
+#endif // NEZVEC2_F
 
 #ifndef NEZHBAPI
     #ifdef NEZ_HITBOX_STATIC
@@ -245,3 +236,4 @@ bool HitboxResolveDynamicRectVsRect(NezRect_f *movingRect, NezVec2_f *velocity, 
 }
 
 #endif //HITBOX_COLLISIONS_IMPLEMENTATION
+
