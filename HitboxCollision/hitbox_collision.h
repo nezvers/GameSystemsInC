@@ -157,17 +157,14 @@ bool HitboxVsRaycast(NezVec2_f *rayOrig, NezVec2_f *rayDir, NezRect_f *target, N
     
     // Cache division
     NezVec2_f invdir = (NezVec2_f){1.0f / rayDir->x, 1.0f / rayDir->y};
-    printf("InvDir: (%f, %f)\n", invdir.x, invdir.y);
     
     // Calculate intersections with rectangle bounding axes
     NezVec2_f t_near = (NezVec2_f){(target->x - rayOrig->x) * invdir.x, (target->y - rayOrig->y) * invdir.y};
     NezVec2_f t_far = (NezVec2_f){(target->x + target->w - rayOrig->x) * invdir.x, (target->y + target->h - rayOrig->y) * invdir.y};
     
     if (isnan(t_near.x) || isnan(t_near.y)){
-        //printf("t_near is inf\n");
         return false;}
     if (isnan(t_far.x) || isnan(t_far.y)){
-        //printf("t_far is inf\n");
         return false;}
     
     // Sort distance
@@ -240,7 +237,6 @@ bool HitboxResolveDynamicRectVsRect(NezRect_f *movingRect, NezVec2_f *velocity, 
     NezVec2_f colNormal;
     float timeStep = 0.0f;
     if (HitboxDynamicVsHitbox(movingRect, velocity, target, &colPoint, &colNormal, &timeStep)){
-        //if (colNormal.y > 0) {// bottom collision is target}
         velocity->x += colNormal.x * (float)fabs(velocity->x) * (1 - timeStep);
         velocity->y += colNormal.y * (float)fabs(velocity->y) * (1 - timeStep);
         return true;
