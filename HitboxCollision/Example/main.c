@@ -78,6 +78,7 @@ void GameUpdate(){
     static bool isGrounded = false;
     static int dirX = 0;
     
+    
     // INPUT DIRECTION
     dirX = (float)(IsKeyDown(KEY_D) - IsKeyDown(KEY_A));
     
@@ -107,7 +108,6 @@ void GameUpdate(){
     HitboxMoveAndCollideGrid(&player, &vel, &map);
     
     // GROUND CHECK
-    printf("%f, %f\n", prevY, vel.y);
     if (prevY > vel.y){
         isGrounded = true;
     }

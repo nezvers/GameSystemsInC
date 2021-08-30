@@ -95,7 +95,6 @@ void HitboxMoveAndCollide(NezRect_f *a, NezVec2_f *velocity, NezRect_f *b, int c
     int i;
     bool hitX = false;
     bool hitY = false;
-    
     a->x += velocity->x;
     for (i = 0; i < count; i++){
         if (HitboxCheckHitbox(a, &b[i])) {
@@ -125,7 +124,6 @@ void HitboxMoveAndCollide(NezRect_f *a, NezVec2_f *velocity, NezRect_f *b, int c
         }
     }
     if(hitY){velocity->y = 0.0f;}
-    printf("y: %f\n", velocity->y);
 }
 
 NezRect_f HitboxExpand(NezRect_f *rect, NezVec2_f *size){
@@ -151,7 +149,6 @@ void HitboxListFromGrid(NezRect_f *rect, NezGridMap *grid, NezRect_f **outList, 
     int sizeY = (int)(rect->h / grid->s) + 1;
     
     *outList = malloc(sizeof(NezRect_f) * sizeX * sizeY);
-    //printf("offX: %d, %d\n", sizeX, sizeY);
     *outCount = 0;
     
     for (int y = Y; y < Y + sizeY; y++){
@@ -175,7 +172,10 @@ void HitboxListFromGrid(NezRect_f *rect, NezGridMap *grid, NezRect_f **outList, 
 }
 
 void HitboxMoveAndCollideGrid(NezRect_f *a, NezVec2_f *velocity, NezGridMap *grid){
-    NezRect_f colArea = HitboxExpand(a, velocity);
+    //NezRect_f colArea = HitboxExpand(a, velocity);
+    NezRect_f colArea = *a;
+    colArea.x += velocity->x;
+    colArea.y += velocity->y;
     NezRect_f *tiles = (void*){0};
     int count;
     HitboxListFromGrid(&colArea, grid, &tiles, &count);
