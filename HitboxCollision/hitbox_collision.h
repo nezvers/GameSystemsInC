@@ -7,10 +7,8 @@
 #define HITBOX_COLLISIONS_H
 
 
-#include "stdio.h"
 #include "stdlib.h"
 #include "stdbool.h"
-#include "math.h"
 
 #ifndef NEZRECT_F
 #define NEZRECT_F
