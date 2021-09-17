@@ -51,12 +51,12 @@ typedef struct {
 
 // Collision flags
 enum {
-    RIGHT_COL,
-    LEFT_COL,
-    TOP_COL,
-    BOTTOM_COL,
-    X_COL,
-    Y_COL,
+    RIGHT_COL = 1,
+    LEFT_COL = 2,
+    TOP_COL = 4,
+    BOTTOM_COL = 8,
+    X_COL = 16,
+    Y_COL = 32,
 };
 
 #ifndef NEZHBAPI
