@@ -70,9 +70,13 @@ enum {
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+    
+    // Static collision resolution
     NEZHBAPI char
         HitboxMoveAndCollide(NezRect_f *rect, NezVec2_f *velocity, NezRect_f *bodies, int count, NezGridMap *grid);
+    // Dynamic resolution using raycast
+    NEZHBAPI char
+        HitboxMoveAndCollideContinuous(NezRect_f *rect, NezVec2_f *velocity, NezRect_f *bodies, int count, NezGridMap *grid);
     // Check if two hitboxes collides
     NEZHBAPI bool
         HitboxCheckHitbox(NezRect_f *a, NezRect_f *b);
@@ -85,8 +89,6 @@ extern "C" {
         HitboxGridArea(NezRect_f *rect, NezGridMap *grid, int *areaOut);
     NEZHBAPI void
         HitboxListFromGrid(NezGridMap *grid, int *area, NezRect_f **outList, int *outCount);
-        
-    // FUTURE EXPANSION
     // Raycast against rectangle
     NEZHBAPI bool
         HitboxVsRaycast(NezVec2_f *rayOrig, NezVec2_f *rayDir, NezRect_f *target, NezVec2_f *colPoint, NezVec2_f *colNormal, float *timeStep);
@@ -350,6 +352,191 @@ bool HitboxResolveDynamicRectVsRect(NezRect_f *movingRect, NezVec2_f *velocity, 
     }
     return false;
 }
+
+// ### --- *** SORTING *** --- ###
+// IntroSort(data, size)
+
+typedef struct{
+    NezRect_f rect;
+    float toi;
+}RectToi;
+
+typedef struct{
+    int size;
+    RectToi *rectToi;
+}RectListExt;
+
+bool sort_bigoreq(RectToi *a, RectToi *b){
+    return a->toi >= b->toi;
+}
+
+bool sort_biger(RectToi *a, RectToi *b){
+    return a->toi > b->toi;
+}
+
+void sort_set(RectToi *a, RectToi *b){
+    a->rect.x = b->rect.x;
+    a->rect.y = b->rect.y;
+    a->rect.w = b->rect.w;
+    a->rect.h = b->rect.h;
+    a->toi = b->toi;
+}
+
+void sort_swap(RectToi *a, RectToi *b){
+    RectToi temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void InsertionSort(RectToi* data, int count) {
+	for (int i = 1; i < count; ++i){
+		int j = i;
+		while (j > 0){
+			if (sort_biger( &data[j - 1], &data[j])){
+                sort_swap(&data[j], &data[j - 1]);
+				--j;
+			}
+			else{
+				break;
+			}
+		}
+	}
+}
+
+void MaxHeapify(RectToi* data, int heapSize, int index) {
+	int left = (index + 1) * 2 - 1;
+	int right = (index + 1) * 2;
+	int largest = 0;
+
+	if (left < heapSize && sort_biger(&data[left], &data[index]) ){
+		largest = left;
+    }
+	else{
+		largest = index;
+    }
+
+	if (right < heapSize && sort_biger(&data[right], &data[largest])){
+		largest = right;
+    }
+
+	if (largest != index){
+        sort_swap(&data[index], &data[largest]);
+
+		MaxHeapify(data, heapSize, largest);
+	}
+}
+
+void HeapSort(RectToi* data, int count) {
+	int heapSize = count;
+
+	for (int p = (heapSize - 1) / 2; p >= 0; --p){
+		MaxHeapify(data, heapSize, p);
+    }
+
+	for (int i = count - 1; i > 0; --i)	{
+        sort_swap(&data[i], &data[0]);
+
+		--heapSize;
+		MaxHeapify(data, heapSize, 0);
+	}
+}
+
+int Partition(RectToi* data, int left, int right) {
+	void *pivot = &data[right];
+	int i = left;
+
+	for (int j = left; j < right; ++j){
+		if ( sort_bigoreq(pivot, &data[j])){
+			sort_swap(&data[j], &data[i]);
+			i++;
+		}
+	}
+    sort_set(&data[right], &data[i]);
+    sort_set(&data[i], pivot);
+	return i;
+}
+
+void QuickSortRecursive(RectToi* data, int left, int right){
+	if (left < right){
+		int q = Partition(data, left, right);
+		QuickSortRecursive(data, left, q - 1);
+		QuickSortRecursive(data, q + 1, right);
+	}
+}
+
+void IntroSort(RectToi* data, int count) {
+	int partitionSize = Partition(data, 0, count - 1);
+
+	if (partitionSize < 16)	{
+		InsertionSort(data, count);
+	}
+	else if (partitionSize >(2 * log(count))){
+		HeapSort(data, count);
+	}
+	else{
+		QuickSortRecursive(data, 0, count - 1);
+	}
+}
+
+char HitboxMoveAndCollideContinuous(NezRect_f *rect, NezVec2_f *velocity, NezRect_f *bodies, int count, NezGridMap *grid){
+    NezRect_f colArea = HitboxExpand(rect, velocity);
+    RectListExt colList = {0};
+    int tileCount = 0;
+    NezVec2_f cp, cn;
+    int colCount = 0;
+    char flags = 0;
+    if (grid){
+        int cellArea[4];                                            // x, y, w, h
+        HitboxGridArea(&colArea, grid, cellArea);                   // position on grid and tiles taken
+        int t = cellArea[3] * cellArea[3];
+        NezRect_f *tiles = malloc(sizeof(NezRect_f) * t);   // allocate for tile rectangles
+        HitboxListFromGrid(grid, cellArea, &tiles, &tileCount);     // receive tile rects and count
+        colList.rectToi = malloc(sizeof(RectToi) * (count + tileCount)); // allocate total rects      
+        
+        for(int i = 0; i < tileCount; i++){
+            colList.rectToi[i].rect = tiles[i];
+        }
+        if (tiles){ free(tiles); }
+    }
+    else{
+        colList.rectToi = malloc(sizeof(RectToi) * count);
+    }
+    colList.size = count + tileCount;
+    // insert bodies
+    for (int i = 0; i < count; i++){
+        colList.rectToi[tileCount + i].rect = bodies[i];
+    }
+    // Get collision TOI for each collision
+    for (int i = 0; i < count + tileCount; i++){
+        if(HitboxDynamicVsHitbox(rect, velocity, &colList.rectToi[i].rect, &cp, &cn, &colList.rectToi[i].toi)){
+            colCount += 1;
+            if (cn.x < 0.0f){flags |= RIGHT_COL;}
+            else if (cn.x > 0.0f){flags |= LEFT_COL;}
+            if (cn.y < 0.0f){flags |= BOTTOM_COL;}
+            else if (cn.y > 0.0f){flags |= TOP_COL;}
+        }
+        else{
+            colList.rectToi[i].toi = 2.0f;
+        }
+    }
+    
+    // Sort by TOI (time of impact) 
+    IntroSort(colList.rectToi, colList.size);
+    
+    
+    for (int i = 0; i < colCount; i++){
+        HitboxResolveDynamicRectVsRect(rect, velocity, &colList.rectToi[i].rect);
+    }
+    
+    if(colList.rectToi){
+        free(colList.rectToi);
+    }
+    rect->x += velocity->x;
+    rect->y += velocity->y;
+    
+    return flags;
+}
+
 
 /* // NOT USED
 // bool HitboxAxisCollisionCheck(NezRect_f *a, NezRect_f *b, float *dirX, float *dirY) {
