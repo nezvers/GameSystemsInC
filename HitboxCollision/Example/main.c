@@ -209,8 +209,8 @@ void UpdatePlayer(){
     }
     
     
-    //char flags = HitboxMoveAndCollide(&player, &vel, obstacles, 1, &map);
-    char flags = HitboxMoveAndCollideContinuous(&player, &vel, obstacles, 1, &map);
+    char flags = HitboxMoveAndCollide(&player, &vel, obstacles, 1, &map);
+    //char flags = HitboxMoveAndCollideContinuous(&player, &vel, obstacles, 1, &map);
     
     
     isGrounded = flags & BOTTOM_COL;
