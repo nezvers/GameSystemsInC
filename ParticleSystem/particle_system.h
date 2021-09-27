@@ -1,7 +1,6 @@
 #ifndef PARTICLE_SYSTEM_H
 #define PARTICLE_SYSTEM_H
 #include "stdio.h"
-#include "stdbool.h"
 
 #ifndef NEZVEC2_F
 #define NEZVEC2_F
@@ -52,6 +51,15 @@ typedef struct{
 extern "C" {
 #endif
 
+NEZPSAPI Emitter*
+	EmitterNew(EmiterConfig config);
+NEZPSAPI void
+	EmitterDestroy(Emitter* emitter);
+NEZPSAPI void
+	EmitterUpdate(Emitter* emitter, float delta);
+NEZPSAPI void
+	EmitterDraw(Emitter* emitter);
+
 #ifdef __cplusplus
 }
 #endif
@@ -60,5 +68,6 @@ extern "C" {
 
 #ifdef PARTICLE_SYSTEM_IMPLEMENTATION
 #undef PARTICLE_SYSTEM_IMPLEMENTATION
+#include "stdbool.h"
 
 #endif //PARTICLE_SYSTEM_IMPLEMENTATION
