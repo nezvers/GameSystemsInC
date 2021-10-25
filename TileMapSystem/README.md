@@ -1,7 +1,5 @@
 # TileMap system in C [Raylib rendering]
 
-## Very early build and heavy work in progress. High probability of bugs.
-
 `TileMapDrawExWorld(TileMap *tileMap, int x, int y, int width, int height)`    
 ![](https://github.com/nezvers/GameSystemsInC/raw/master/TileMapSystem/Resource/Preview.gif)    
 `void AutoTileSetCell(AutoTile *autoTile, int x, int y)`    
