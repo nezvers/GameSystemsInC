@@ -15,8 +15,8 @@ int gameHeight = 180;
 int screenWidth = 320;
 int screenHeight = 180;
 RenderTexture viewport;
-Rectangle viewRect;
-Rectangle screenRect;
+NezRect_f viewRect;
+NezRect_f screenRect;
 
 void (*scaler[6])(Rectangle*, Rectangle*, int*, int*, int*, int*);
 int funcIndex = 0;
@@ -63,10 +63,10 @@ void UpdateResolution(){
     
     // Change resolution for RenderTexture
     UnloadRenderTexture(viewport);
-    viewport = LoadRenderTexture((int)viewRect.width, (int)viewRect.height);
+    viewport = LoadRenderTexture((int)viewRect.w, (int)viewRect.h);
     
     // RenderTexture needs to be flipped
-    viewRect.height *= -1;
+    viewRect.h *= -1;
 }
 
 void GameDraw(){
@@ -101,7 +101,7 @@ void DrawScene(){
     DrawLine(gameWidth,0, gameWidth - gameHeight, gameHeight, LIGHTGRAY);
     for (int i = 0; i < 20; i++){
         int m = 10;
-        DrawRectangleLines(0 - m * i, 0 - m * i, gameWidth + m * 2 * i, gameHeight + m * 2 * i, LIGHTGRAY);
+        DrawTexturePro(viewport.texture, *(Rectangle*)&viewRect, *(Rectangle*)&screenRect, orig, 0.0f, WHITE);
     }
 }
 
