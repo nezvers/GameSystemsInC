@@ -96,10 +96,10 @@ void ViewportKeepAspectPixel(NezRect_f *view, NezRect_f *screen, int *viewWidth,
     view->x = 0.0f;
     view->y = 0.0f;
     
-    screen->w = (int)view->w * scale;
-    screen->h = (int)view->h * scale;
-    screen->x = (*windowWidth - screen->w) / 2;
-    screen->y = (*windowHeight - screen->h) / 2;
+    screen->w = *viewWidth * scale;
+    screen->h = *viewHeight * scale;
+    screen->x = (int)((*windowWidth - screen->w) * 0.5);
+    screen->y = (int)((*windowHeight - screen->h) * 0.5);
 }
 
 void ViewportKeepHeightPixel(NezRect_f *view, NezRect_f *screen, int *viewWidth, int *viewHeight, int *windowWidth, int *windowHeight){
@@ -109,10 +109,10 @@ void ViewportKeepHeightPixel(NezRect_f *view, NezRect_f *screen, int *viewWidth,
     view->x = 0.0f;
     view->y = 0.0f;
     
-    screen->w = (int)view->w * scale;
-    screen->h = (int)view->h * scale;
-    screen->x = (*windowWidth - screen->w) / 2;
-    screen->y = (*windowHeight - screen->h) / 2;
+    screen->w = view->w * scale;
+    screen->h = view->h * scale;
+    screen->x = (int)((*windowWidth - screen->w) * 0.5);
+    screen->y = (int)((*windowHeight - screen->h) * 0.5);
 }
 
 void ViewportKeepWidthPixel(NezRect_f *view, NezRect_f *screen, int *viewWidth, int *viewHeight, int *windowWidth, int *windowHeight){
@@ -124,8 +124,8 @@ void ViewportKeepWidthPixel(NezRect_f *view, NezRect_f *screen, int *viewWidth, 
     
     screen->w = (int)view->w * scale;
     screen->h = (int)view->h * scale;
-    screen->x = (*windowWidth - screen->w) / 2;
-    screen->y = (*windowHeight - screen->h) / 2;
+    screen->x = (int)((*windowWidth - screen->w) * 0.5);
+    screen->y = (int)((*windowHeight - screen->h) * 0.5);
 }
 
 void ViewportKeepAspect(NezRect_f *view, NezRect_f *screen, int *viewWidth, int *viewHeight, int *windowWidth, int *windowHeight){
@@ -137,8 +137,8 @@ void ViewportKeepAspect(NezRect_f *view, NezRect_f *screen, int *viewWidth, int 
     
     screen->w = view->w * scale;
     screen->h = view->h * scale;
-    screen->x = (*windowWidth - screen->w) / 2;
-    screen->y = (*windowHeight - screen->h) / 2;
+    screen->x = (int)((*windowWidth - screen->w) * 0.5);
+    screen->y = (int)((*windowHeight - screen->h) * 0.5);
 }
 
 void ViewportKeepHeight(NezRect_f *view, NezRect_f *screen, int *viewWidth, int *viewHeight, int *windowWidth, int *windowHeight){
@@ -150,8 +150,8 @@ void ViewportKeepHeight(NezRect_f *view, NezRect_f *screen, int *viewWidth, int 
     
     screen->w = view->w * scale;
     screen->h = view->h * scale;
-    screen->x = (*windowWidth - screen->w) / 2;
-    screen->y = (*windowHeight - screen->h) / 2;
+    screen->x = (int)((*windowWidth - screen->w) * 0.5);
+    screen->y = (int)((*windowHeight - screen->h) * 0.5);
 }
 
 void ViewportKeepWidth(NezRect_f *view, NezRect_f *screen, int *viewWidth, int *viewHeight, int *windowWidth, int *windowHeight){
@@ -163,8 +163,8 @@ void ViewportKeepWidth(NezRect_f *view, NezRect_f *screen, int *viewWidth, int *
     
     screen->w = view->w * scale;
     screen->h = view->h * scale;
-    screen->x = (*windowWidth - screen->w) / 2;
-    screen->y = (*windowHeight - screen->h) / 2;
+    screen->x = (int)((*windowWidth - screen->w) * 0.5);
+    screen->y = (int)((*windowHeight - screen->h) * 0.5);
 }
 
 #endif //VIEWPORT_SCALING_IMPLEMENTATION
