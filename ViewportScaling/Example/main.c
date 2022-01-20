@@ -97,8 +97,8 @@ void GameDraw(){
 
 void DrawScene(){
     DrawRectangleLines(0, 0, gameWidth, gameHeight, GOLD);
-    DrawLine(0,0,gameWidth, gameHeight, LIGHTGRAY);
-    DrawLine(gameWidth,0, 0, gameHeight, LIGHTGRAY);
+    DrawLine(0,0,gameHeight, gameHeight, LIGHTGRAY);
+    DrawLine(gameWidth,0, gameWidth - gameHeight, gameHeight, LIGHTGRAY);
     for (int i = 0; i < 20; i++){
         int m = 10;
         DrawRectangleLines(0 - m * i, 0 - m * i, gameWidth + m * 2 * i, gameHeight + m * 2 * i, LIGHTGRAY);
