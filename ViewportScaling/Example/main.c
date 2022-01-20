@@ -66,7 +66,6 @@ void UpdateResolution(){
     viewport = LoadRenderTexture((int)viewRect.width, (int)viewRect.height);
     
     // RenderTexture needs to be flipped
-    viewRect.y = -viewRect.height;
     viewRect.height *= -1;
 }
 
