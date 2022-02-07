@@ -13,7 +13,7 @@ typedef struct
 {
     int *grid;
     TileSet *tileSet;
-    RenderTexture2D texture;
+    //RenderTexture2D texture;
     int x;
     int y;
     int width;
@@ -33,7 +33,7 @@ extern "C"
 #endif
 #endif
 
-    NEZTMAPI TileMap *
+    NEZTMAPI TileMap*
     TileMapNew(); // Allocates memory and give pointer to it
     NEZTMAPI void
     TileMapDestroy(TileMap *tileMap); // Free allocated memory (TileMap and grid)
@@ -93,11 +93,13 @@ TileMap *TileMapNew()
 
 void TileMapDestroy(TileMap *tileMap)
 {
-    if (tileMap->grid)
-    {
-        free(tileMap->grid);
+    if(tileMap){
+        if (tileMap->grid)
+        {
+            free(tileMap->grid);
+        }
+        free(tileMap);
     }
-    free(tileMap);
 }
 
 void TileMapInitSize(TileMap *tileMap, int width, int height)
@@ -170,11 +172,13 @@ void TileMapSetTile(TileMap *tileMap, int x, int y, int id)
 NezVec2_i TileMapSetTileResize(TileMap *tileMap, int x, int y, int id)
 {
     NezVec2_i offset = {0};
-
+    //not existing tile
     if (id < -1 || id > tileMap->tileSet->tileCount - 1)
     {
         return offset;
     }
+
+    // inside tilemap rectangle per axis
     bool xIn = x > -1 && x < tileMap->width;
     bool yIn = y > -1 && y < tileMap->height;
 
@@ -189,14 +193,14 @@ NezVec2_i TileMapSetTileResize(TileMap *tileMap, int x, int y, int id)
         }
     }
     //RESIZE
-    else if (id != -1)
+    else if (id > -1)
     {
         int left, top, right, bottom;
         left = x < 0 ? x : 0;
         top = y < 0 ? y : 0;
         right = x > tileMap->width - 1 ? x - (tileMap->width - 1) : 0;
         bottom = y > tileMap->height - 1 ? y - (tileMap->height - 1) : 0;
-        TileMapResize(tileMap, left, top, right, bottom);
+        TileMapResize(tileMap, left, top, right, bottom); // border adjustments
         x -= left;
         y -= top;
         offset = (NezVec2_i){left, top};
@@ -227,7 +231,7 @@ void TileMapResize(TileMap *tileMap, int left, int top, int right, int bottom)
     int h = tileMap->height - top + bottom;       //new height
     int *tmp = tileMap->grid;                     //preparing for deleting old pointer
 
-    tileMap->grid = malloc(sizeof(int) * w * h);
+    tileMap->grid = malloc(sizeof(int) * w * h);  // Yeet
     for (int i = 0; i < w * h; i++)
     {
         tileMap->grid[i] = -1;
@@ -390,53 +394,60 @@ void TileMapDrawEx(TileMap *tileMap, int x, int y, int width, int height)
 void TileMapDrawExWorld(TileMap *tileMap, int x, int y, int width, int height)
 {
     // find tile coordinates
-    int distX = x - tileMap->x;
-    int distY = y - tileMap->y;
-    int signX = distX >= 0 ? 1 : -1;
-    int signY = distY >= 0 ? 1 : -1;
+    int localX = x - tileMap->x;
+    int localY = y - tileMap->y;
+    int signX = localX >= 0 ? 1 : -1;
+    int signY = localY >= 0 ? 1 : -1;
     int tileSizeX = tileMap->tileSet->tileX;
     int tileSizeY = tileMap->tileSet->tileY;
-    int X = distX / tileSizeX;
-    int Y = distY / tileSizeY;
+    int X = localX / tileSizeX;
+    int Y = localY / tileSizeY;
     // compensate flooring if negative cell positions
-    if (signX < 0 && X * tileSizeX != distX)
+    if (signX < 0 && X * tileSizeX != localX)
     {
         X += signX;
     }
-    if (signY < 0 && Y * tileSizeY != distY)
+    if (signY < 0 && Y * tileSizeY != localY)
     {
         Y += signY;
     }
-    int W = (width / tileSizeX) + 1;
-    int H = (height / tileSizeY) + 1;
+    
+    int X2 = (localX + width) / tileSizeX;
+    int Y2 = (localY + height) / tileSizeY;
+
+    int W = (X2 - X) + 1;
+    int H = (Y2 - Y) + 1;
     TileMapDrawPart(tileMap, tileMap->x, tileMap->y, X, Y, W, H);
 }
 
 void TileMapDrawExSpreadWorld(TileMap *tileMap, int x, int y, int width, int height, float spreadX, float spreadY)
 {
     // find tile coordinates
-    int distX = x - tileMap->x;
-    int distY = y - tileMap->y;
-    int signX = distX >= 0 ? 1 : -1;
-    int signY = distY >= 0 ? 1 : -1;
+    int localX = x - tileMap->x;
+    int localY = y - tileMap->y;
+    int signX = localX >= 0 ? 1 : -1;
+    int signY = localY >= 0 ? 1 : -1;
     int tileSizeX = tileMap->tileSet->tileX;
     int tileSizeY = tileMap->tileSet->tileY;
-    int X = distX / tileSizeX;
-    int Y = distY / tileSizeY;
+    int X = localX / tileSizeX;
+    int Y = localY / tileSizeY;
     // compensate flooring if negative cell positions
-    if (signX < 0 && X * tileSizeX != distX)
+    if (signX < 0 && X * tileSizeX != localX)
     {
         X += signX;
     }
-    if (signY < 0 && Y * tileSizeY != distY)
+    if (signY < 0 && Y * tileSizeY != localY)
     {
         Y += signY;
     }
-    int W = (width / tileSizeX) + 1;
-    int H = (height / tileSizeY) + 1;
     
-    float cellOffX = (float)(distX % tileSizeX)/ tileSizeX * spreadX;
-    float cellOffY = (float)(distY % tileSizeY)/ tileSizeY * spreadY;
+    int X2 = (localX + width) / tileSizeX;
+    int Y2 = (localY + height) / tileSizeY;
+    int W = (X2 - X) + 1;
+    int H = (Y2 - Y) + 1;
+    
+    float cellOffX = (float)(localX % tileSizeX)/ tileSizeX * spreadX;
+    float cellOffY = (float)(localY % tileSizeY)/ tileSizeY * spreadY;
     
     int offX = -((spreadX *W) *0.5 +cellOffX -spreadX);
     int offY = -((spreadY *H) *0.5 +cellOffY -spreadY);
