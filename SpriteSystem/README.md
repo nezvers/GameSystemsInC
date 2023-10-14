@@ -3,6 +3,7 @@
 ![](https://github.com/nezvers/GameSystemsInC/raw/master/SpriteSystem/examples/resources/Preview_Sprite_anim_scale.gif)
 
 ## sprite_rect.h
+- Manages rectangle from texture to drawing rectangle
 - Framework independent
 - No allocations, user pre-allocated/ managed memory
 - Overridable Vector2 & Rectangle typedefs
