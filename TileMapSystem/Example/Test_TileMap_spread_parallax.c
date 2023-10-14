@@ -12,9 +12,9 @@
 
 #include "raylib.h"
 #define NEZ_TILEMAP_IMPLEMENTATION
-#include "tilemap.h"
+#include "../tilemap.h"
 #define NEZ_TILESET_IMPLEMENTATION
-#include "tileset.h"
+#include "../tileset.h"
 
 int screenWidth = 320;
 int screenHeight = 180;
@@ -81,7 +81,7 @@ void InitGame(){
     camera.zoom = 2.0f;
     SetMapData();
     
-    tileSet = TileSetNewInitFromFile("../Resource/RDE_8x8.png", 8, 8, NULL, 0);
+    tileSet = TileSetNewInitFromFile("Resource/RDE_8x8.png", 8, 8, NULL, 0);
     
     tileMap1 = TileMapNew();
     tileMap1->tileSet = tileSet;

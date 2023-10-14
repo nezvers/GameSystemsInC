@@ -12,9 +12,9 @@
 
 #include "raylib.h"
 #define NEZ_TILEMAP_IMPLEMENTATION
-#include "tilemap.h"
+#include "../tilemap.h"
 #define NEZ_TILESET_IMPLEMENTATION
-#include "tileset.h"
+#include "../tileset.h"
 
 int screenWidth = 480;
 int screenHeight = 240;
@@ -66,7 +66,7 @@ int main(){
 }
 
 void InitGame(void){
-    tileSet = TileSetNewInitFromFile("../Resource/TileSetter_template.png", 16, 16, NULL, 0);
+    tileSet = TileSetNewInitFromFile("Resource/TileSetter_template.png", 16, 16, NULL, 0);
     tileMap = TileMapNew();
     tileMap->tileSet = tileSet;
     tileMap->x = 100;
@@ -89,6 +89,7 @@ void DefaultScreen(){
     //----------------------------------------------------------------------------------
     BeginDrawing();
     ClearBackground(RAYWHITE);
+    DrawText("Use WASD to move fake camera", 20, 20, 16, BLACK);
         TileMapDrawGrid(tileMap, BLACK);
         // only draw tiles that camera can see
         TileMapDrawExWorld(tileMap, (int)cam.x, (int)cam.y, cam.w, cam.h);

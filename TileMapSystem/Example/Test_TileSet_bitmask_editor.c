@@ -6,7 +6,7 @@ Press enter to print a ready-to-use line in console.
 #include <stdio.h>
 #include "raylib.h"
 #define NEZ_TILESET_IMPLEMENTATION
-#include "tileset.h"
+#include "../tileset.h"
 
 int screenWidth = 480;
 int screenHeight = 240;
@@ -61,7 +61,7 @@ int *bitmask;
 
 void InitGame(void){
     
-    tileSet = TileSetNewInitFromFile("../Resource/TileSetter_template.png", 16, 16, NULL, 0);
+    tileSet = TileSetNewInitFromFile("Resource/TileSetter_template.png", 16, 16, NULL, 0);
     texture = LoadRenderTexture((tileSet->collumns*tileSet->tileX), (tileSet->rows*tileSet->tileY));
     col = tileSet->collumns;
     row = tileSet->rows;

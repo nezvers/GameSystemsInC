@@ -14,11 +14,11 @@
 #include "stdio.h"
 
 #define NEZ_AUTOTILE_IMPLEMENTATION
-#include "autotile.h"
+#include "../autotile.h"
 #define NEZ_TILEMAP_IMPLEMENTATION
-#include "tilemap.h"
+#include "../tilemap.h"
 #define NEZ_TILESET_IMPLEMENTATION
-#include "tileset.h"
+#include "../tileset.h"
 #include "Resource/TileSetBitmask.h"
 
 int screenWidth = 480;
@@ -69,8 +69,8 @@ int main(){
 }
 
 void InitGame(void){
-    //tileSet = TileSetNewInitFromFile("../Resource/TileSetter_template.png", 16, 16);
-    tileSet = TileSetNewInitFromFile("../Resource/grass_and_dirt_tiles.png", 16, 16, NULL, 0);
+    //tileSet = TileSetNewInitFromFile("Resource/TileSetter_template.png", 16, 16);
+    tileSet = TileSetNewInitFromFile("Resource/grass_and_dirt_tiles.png", 16, 16, NULL, 0);
     
     // tilemap for each autoTile
     tileMap1 = TileMapNew();
