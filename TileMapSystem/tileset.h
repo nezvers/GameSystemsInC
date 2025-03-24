@@ -137,13 +137,13 @@ void TileSetSetSize(TileSet *tileSet, int tileWidth, int tileHeight){
 }
 
 void TileSetDrawTile(TileSet *tileSet, int id, int x, int y){
-    if(!tileSet->customPositions){
+    if(!tileSet->customPositions && tileSet->collumns > 0){
         int col = id % tileSet->collumns;
         int row = id / tileSet->collumns;
         Rectangle tileRect = {(float)col * tileSet->tileX, (float)row * tileSet->tileY, (float)tileSet->tileX, (float)tileSet->tileY};
         DrawTextureRec(tileSet->texture, tileRect, (Vector2){(float)x, (float)y}, WHITE);
     }
-    else{
+    else if (tileSet->collumns > 0){
         Rectangle tileRect = {(float)tileSet->positionList[id].x, (float)tileSet->positionList[id].y, (float)tileSet->tileX, (float)tileSet->tileY};
         DrawTextureRec(tileSet->texture, tileRect, (Vector2){(float)x, (float)y}, WHITE);
     }

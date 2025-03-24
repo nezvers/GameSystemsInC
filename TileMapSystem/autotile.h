@@ -116,7 +116,6 @@ AutoTile* AutoTileNewInitTileList(TileMap *tileMap, int *tileList, int tileCount
     AutoTile *autoTile = AutoTileNew();
     
     AutoTileInit(autoTile, tileMap, tileList, tileCount);
-    free(tileList);
     return autoTile;
 }
 

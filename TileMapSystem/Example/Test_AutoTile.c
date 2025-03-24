@@ -108,6 +108,7 @@ void DefaultScreen(){
         TileMapDraw(tileMap2); //dirt
         TileMapDraw(tileMap1); //grass
         //TileMapDrawExWorld(tileMap, 0, 0, 20, 10);
+        DrawText("Press 1 or 2 to switch autotiles", 100, 0, 8, (Color){18, 18, 18, 150});
     EndDrawing();
 }
 

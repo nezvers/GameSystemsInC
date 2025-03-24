@@ -81,7 +81,7 @@ void InitGame(){
     camera.zoom = 2.0f;
     SetMapData();
     
-    tileSet = TileSetNewInitFromFile("Resource/RDE_8x8.png", 8, 8, NULL, 0);
+    tileSet = TileSetNewInitFromFile(SOURCE_PATH"/Resource/RDE_8x8.png", 8, 8, NULL, 0);
     
     tileMap1 = TileMapNew();
     tileMap1->tileSet = tileSet;

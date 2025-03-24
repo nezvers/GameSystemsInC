@@ -66,7 +66,7 @@ int main(){
 }
 
 void InitGame(void){
-    tileSet = TileSetNewInitFromFile("Resource/TileSetter_template.png", 16, 16, NULL, 0);
+    tileSet = TileSetNewInitFromFile(SOURCE_PATH"/Resource/TileSetter_template.png", 16, 16, NULL, 0);
     tileMap = TileMapNew();
     tileMap->tileSet = tileSet;
     tileMap->x = 100;
