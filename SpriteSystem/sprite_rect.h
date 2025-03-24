@@ -97,8 +97,8 @@ SpritePlay(Sprite *sprite, SpriteAnimation* sprite_anim, float delta, bool loop,
 
 //----------------------------------------------------------------------------
 
-#ifdef NEZ_SPRITE_IMPLEMENTATION
-#undef NEZ_SPRITE_IMPLEMENTATION
+#ifdef NEZ_SPRITE_RECT_IMPLEMENTATION
+#undef NEZ_SPRITE_RECT_IMPLEMENTATION
 float SpriteAbs(float x){return x>0.0 ? x : -x;}
 int SpriteSign(float x) { return x < 0.0 ? -1 : 1; }
 
@@ -188,6 +188,6 @@ SpritePlay(Sprite* sprite, SpriteAnimation* sprite_anim, float delta, bool loop,
 }
 
 
-#endif // NEZ_SPRITE_IMPLEMENTATION
+#endif // NEZ_SPRITE_RECT_IMPLEMENTATION
 
 

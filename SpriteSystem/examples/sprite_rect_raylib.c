@@ -1,26 +1,3 @@
-/*******************************************************************************************
-*
-*   raylib [core] example - Basic window
-*
-*   Welcome to raylib!
-*
-*   To test examples, just press F6 and execute raylib_compile_execute script
-*   Note that compiled executable is placed in the same folder as .c file
-*
-*   You can find all basic examples on C:\raylib\raylib\examples folder or
-*   raylib official webpage: www.raylib.com
-*
-*   Enjoy using raylib. :)
-*
-*   Example originally created with raylib 1.0, last time updated with raylib 1.0
-*
-*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
-*   BSD-like license that allows static linking with closed source software
-*
-*   Copyright (c) 2013-2023 Ramon Santamaria (@raysan5)
-*
-********************************************************************************************/
-
 
 
 #include "raylib.h"
@@ -28,7 +5,7 @@
 #define NEZ_SPRITE_RECT_IMPLEMENTATION
 #define NEZ_VEC2_F Vector2
 #define NEZ_RECT_F Rectangle
-#include "sprite_rect.h"
+#include "../sprite_rect.h"
 
 Texture2D plumber_texture = { 0 };
 Sprite plumber_sprite_1;
@@ -51,7 +28,7 @@ int main(void)
     SetTargetFPS(60);
 
     // Initialization
-    plumber_texture = LoadTexture("resources/Player-sheet.png");
+    plumber_texture = LoadTexture(SOURCE_PATH"/resources/player_sheet.png");
     plumber_animations[0] = SpriteAnimationCreate(1, 12, plumber_idle_IDs);
     plumber_animations[1] = SpriteAnimationCreate(6, 12, plumber_walk_IDs);
     plumber_sprite_1 = SpriteCreate(16, 16, -8, -16, 7, plumber_images); // Sets configurations

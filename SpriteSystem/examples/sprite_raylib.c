@@ -1,13 +1,7 @@
-/*******************************************************************************************
-*
-*   
-*
-********************************************************************************************/
-
 #include "raylib.h"
 
 #define NEZ_SPRITE_IMPLEMENTATION
-#include "sprite.h"
+#include "../sprite.h"
 
 //#define PLATFORM_WEB
 
@@ -26,7 +20,7 @@ void UpdateButtons(void);
 void DrawInterface(void);
 
 Texture texture;
-Camera2D camera = {(Vector2){0}, (Vector2){0}, 0.0f, 4.0f};
+Camera2D camera = {{0}, {0}, 0.0f, 4.0f};
 float x;
 float y;
 Sprite *sprite;
@@ -73,7 +67,7 @@ void InitGame(){
 	InitWindow(screenWidth, screenHeight, "SpriteSystem test");
     UpdateButtons();
 	
-	texture = LoadTexture("../resources/player_sheet.png");
+	texture = LoadTexture(SOURCE_PATH"/resources/player_sheet.png");
 	
 	sprite = SpriteNewFromSheet(&texture, 16, 16, 8, 16);
 	sprite->x = 30;
