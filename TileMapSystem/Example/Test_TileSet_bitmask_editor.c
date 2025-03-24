@@ -61,7 +61,7 @@ int *bitmask;
 
 void InitGame(void){
     
-    tileSet = TileSetNewInitFromFile("Resource/TileSetter_template.png", 16, 16, NULL, 0);
+    tileSet = TileSetNewInitFromFile(SOURCE_PATH"/Resource/TileSetter_template.png", 16, 16, NULL, 0);
     texture = LoadRenderTexture((tileSet->collumns*tileSet->tileX), (tileSet->rows*tileSet->tileY));
     col = tileSet->collumns;
     row = tileSet->rows;
@@ -205,9 +205,9 @@ void UpdateZoom(void){
 }
 
 
-Color colorBit = (Color){ 100, 175, 241, 100 };
-Color colorEmpty = (Color){ 241, 175, 50, 100 };
-Color colorHover = LIGHTGRAY;
+Color colorBit = { 100, 175, 241, 100 };
+Color colorEmpty = { 241, 175, 50, 100 };
+Color colorHover = { 200, 200, 200, 100 };
 
 void DrawTileHighlight(void){
     
