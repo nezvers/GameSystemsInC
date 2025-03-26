@@ -1,5 +1,5 @@
 /*
-    Many implementations are taken from Javidx9 / OneLoneCoder 
+    Influenced by C++ project from Javidx9 / OneLoneCoder 
     https://github.com/OneLoneCoder/olcPixelGameEngine/blob/master/Videos/OneLoneCoder_PGE_Rectangles.cpp
 */
 

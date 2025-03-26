@@ -10,10 +10,6 @@
 
 #define DEBUG
 
-//#define PLATFORM_WEB
-#if defined(PLATFORM_WEB)
-    #include <emscripten/emscripten.h>
-#endif
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
@@ -47,11 +43,11 @@ const int gameWidth = 32*MAP_W;
 const int gameHeight = 32*MAP_H;
 RenderTexture viewport;
 int scale = 1;
-Vector2 vpOffset = (Vector2){0.0f, 0.0f};
+Vector2 vpOffset = {0.0f, 0.0f};
 
 NezRect_f player = {32.0f * 2, 32.0f * 8, 32.0f, 32.0f};
 NezRect_f obstacles[] = {
-    (NezRect_f){32.0f * 15, 32.0f * 5, 32.0f, 32.0f},
+    {32.0f * 15, 32.0f * 5, 32.0f, 32.0f},
 };
 
 #define COIN_COUNT 10
@@ -78,15 +74,13 @@ char tiles[] = {
 
 int main(void){
     GameInit();
-    #if defined(PLATFORM_WEB)
-        emscripten_set_main_loop(GameLoop, 0, 1);
-    #else
+    
     SetTargetFPS(60);
     while (!WindowShouldClose()){
         GameLoop();
     }
     UnloadRenderTexture(viewport);
-    #endif
+
     CloseWindow();
     return 0;
 }
