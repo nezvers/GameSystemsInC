@@ -70,7 +70,7 @@ void UpdateResolution(){
 }
 
 void GameDraw(){
-    const Vector2 orig = (Vector2){0.0f, 0.0f};
+  const Vector2 orig = (Vector2){ 0.0f, 0.0f };
     const char* modes[] = {
         "Keep aspect (pixel) \nTAB to change",
         "Keep height (pixel) \nTAB to change",
@@ -84,8 +84,8 @@ void GameDraw(){
      EndTextureMode();
     BeginDrawing();
     ClearBackground(RAYWHITE);
-        DrawTexturePro(viewport.texture, viewRect, screenRect, orig, 0.0f, WHITE);
-        DrawRectangleLinesEx(screenRect, 1, BLACK);
+        DrawTexturePro(viewport.texture, *(Rectangle*)&viewRect, *(Rectangle*)&screenRect, orig, 0.0f, WHITE);
+        DrawRectangleLinesEx(*(Rectangle*)&screenRect, 1, BLACK);
         
         DrawText(modes[funcIndex], 7, 8, 16, WHITE);
         DrawText(modes[funcIndex], 9, 8, 16, WHITE);
@@ -96,6 +96,7 @@ void GameDraw(){
 }
 
 void DrawScene(){
+    const Vector2 orig = (Vector2){ 0.0f, 0.0f };
     DrawRectangleLines(0, 0, gameWidth, gameHeight, GOLD);
     DrawLine(0,0,gameHeight, gameHeight, LIGHTGRAY);
     DrawLine(gameWidth,0, gameWidth - gameHeight, gameHeight, LIGHTGRAY);
