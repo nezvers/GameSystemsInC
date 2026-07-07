@@ -1,16 +1,14 @@
 # Sprite system in C
 
-![](https://github.com/nezvers/GameSystemsInC/raw/master/SpriteSystem/examples/resources/Preview_Sprite_anim_scale.gif)
 
-## sprite_rect.h
+
+## sprit.h
 - Manages rectangle from texture to drawing rectangle
-- Framework independent
+- Framework independent `sprite.h`
+- Glue code for Raylib `sprite_raylib.h`
 - No allocations, user pre-allocated/ managed memory
-- Overridable Vector2 & Rectangle typedefs
 ```C
-#define NEZ_SPRITE_RECT_IMPLEMENTATION // use for *.c section implementation
-#define NEZ_VEC2_F Vector2
-#define NEZ_RECT_F Rectangle
+#define SPRITE_IMPLEMENTATION // use for *.c section implementation
 #include "sprite_rect.h"
 ```
 
