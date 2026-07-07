@@ -10,10 +10,10 @@ void GameDraw();
 void UpdateResolution();
 void DrawScene();
 
-int gameWidth = 320;
-int gameHeight = 180;
-int screenWidth = 320;
-int screenHeight = 180;
+int viewWidth = 320;
+int viewHeight = 180;
+int windowWidth = 320;
+int windowHeight = 180;
 RenderTexture viewport;
 NezRect_f viewRect;
 NezRect_f screenRect;
@@ -35,7 +35,7 @@ int main(void){
 
 void GameInit() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(screenWidth, screenHeight, "2D viewport scaling");
+    InitWindow(windowWidth, windowHeight, "2D viewport scaling");
     scaler[0] = ViewportKeepAspectPixel;
     scaler[1] = ViewportKeepHeightPixel;
     scaler[2] = ViewportKeepWidthPixel;
@@ -52,14 +52,14 @@ void GameUpdate(){
         UpdateResolution();
     }
     if (IsWindowResized()){
-        screenWidth = GetScreenWidth();
-        screenHeight = GetScreenHeight();
+        windowWidth = GetwindowWidth();
+        windowHeight = GetwindowHeight();
         UpdateResolution();
     }
 }
 
 void UpdateResolution(){
-    scaler[funcIndex](&viewRect, &screenRect, &gameWidth, &gameHeight, &screenWidth, &screenHeight);
+    scaler[funcIndex](&viewRect, &screenRect, &viewWidth, &viewHeight, &windowWidth, &windowHeight);
     
     // Change resolution for RenderTexture
     UnloadRenderTexture(viewport);
@@ -97,9 +97,9 @@ void GameDraw(){
 
 void DrawScene(){
     const Vector2 orig = (Vector2){ 0.0f, 0.0f };
-    DrawRectangleLines(0, 0, gameWidth, gameHeight, GOLD);
-    DrawLine(0,0,gameHeight, gameHeight, LIGHTGRAY);
-    DrawLine(gameWidth,0, gameWidth - gameHeight, gameHeight, LIGHTGRAY);
+    DrawRectangleLines(0, 0, viewWidth, viewHeight, GOLD);
+    DrawLine(0,0,viewHeight, viewHeight, LIGHTGRAY);
+    DrawLine(viewWidth,0, viewWidth - viewHeight, viewHeight, LIGHTGRAY);
     for (int i = 0; i < 20; i++){
         int m = 10;
         DrawTexturePro(viewport.texture, *(Rectangle*)&viewRect, *(Rectangle*)&screenRect, orig, 0.0f, WHITE);
