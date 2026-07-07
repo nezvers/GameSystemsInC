@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Build Test_Sprite All",
+            "name": "(gdb) Build demo All",
             "type": "cppdbg",
             "request": "launch",
             "windows": {
@@ -31,7 +31,7 @@
             "preLaunchTask": "build all",
         },
         {
-            "name": "(gdb) Test_Sprite Build",
+            "name": "(gdb) demo Build",
             "type": "cppdbg",
             "request": "launch",
             "windows": {

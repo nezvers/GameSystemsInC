@@ -106,7 +106,7 @@ rectf GetAnimationFrame(AnimationSet *animation_set) {
 // sprite_out = destination rectangle on screen
 void GetSpriteFrame(Sprite *sprite, rectf *texture_out, rectf *sprite_out) {
     *texture_out = GetAnimationFrame(&sprite->animation_set);
-    *sprite_out = {sprite->position.x, sprite->position.y, texture_out->w, texture_out->h};
+    *sprite_out = (rectf){sprite->position.x, sprite->position.y, texture_out->w, texture_out->h};
 }
 
 #endif

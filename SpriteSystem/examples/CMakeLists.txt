@@ -18,19 +18,11 @@ FetchContent_MakeAvailable(raylib)
 include_directories(${CMAKE_SOURCE_DIR}/..)
 
 
-set(ProjectName Test_Sprite)
+set(ProjectName demo)
 project(${ProjectName})
 set(CMAKE_CXX_STANDARD 17)
-file(GLOB Sprite_SRC_FILES "sprite_raylib.c")
+file(GLOB Sprite_SRC_FILES "demo.c")
 add_executable(${ProjectName} ${Sprite_SRC_FILES})
-target_link_libraries(${ProjectName} raylib)
-target_compile_definitions(${ProjectName} PUBLIC SOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
-
-set(ProjectName Test_SpriteRect)
-project(${ProjectName})
-set(CMAKE_CXX_STANDARD 17)
-file(GLOB SpriteRect_SRC_FILES "sprite_rect_raylib.c")
-add_executable(${ProjectName} ${SpriteRect_SRC_FILES})
 target_link_libraries(${ProjectName} raylib)
 target_compile_definitions(${ProjectName} PUBLIC SOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
 
