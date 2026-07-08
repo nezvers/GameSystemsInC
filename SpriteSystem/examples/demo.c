@@ -21,7 +21,7 @@ Frames anim_up =   {.data = &tex_pos[5], .count = 1, .size = SPRITE_SIZE};
 Frames anim_down = {.data = &tex_pos[4], .count = 1, .size = SPRITE_SIZE};
 Frames *player_anim_list[] = {&anim_idle, &anim_walk, &anim_up, &anim_down};
 
-AnimationSet player_animations = {
+const AnimationSet player_animations = {
     .frames = player_anim_list,
     .count = 4, 
     .animation_index = PlayerStateIdle, 
@@ -30,11 +30,7 @@ AnimationSet player_animations = {
     .time = 0,
 };
 
-Sprite player_sprite;
-Texture2D player_texture;
-
-void init() {
-    player_sprite = (Sprite){
+Sprite player_sprite = (Sprite){
         .animation_set = player_animations,
         .position = {18, 60},
         .origin = {8, 16},
@@ -42,7 +38,9 @@ void init() {
         .scale = {1, 1},
         .rotation = 0,
     };
+Texture2D player_texture;
 
+void init() {
     ChangeAnimation(&player_sprite.animation_set, PlayerStateWalk);
 
     player_texture = LoadTexture(ASSETS_PATH"/player_sheet.png");
