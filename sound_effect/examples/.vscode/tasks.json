@@ -1,0 +1,102 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "delete build",
+            "type": "shell",
+            "windows": {
+                "command": "if exist .\\build\\${config:executableName}.exe del /F /Q .\\build\\${config:executableName}.exe",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": ["/C"]
+                    }
+                }
+            },
+            "linux": {
+                "command": "rm -f ./build/${config:executableName}",
+                "options": {
+                    "shell": {
+                        "executable": "/bin/bash",
+                        "args": ["-c"]
+                    }
+                }
+            },
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Clear previous build"
+        },
+        {
+            "label": "Cmake configure",
+            "type": "shell",
+            "windows": {
+                "command": "cmake",
+                "args": [
+                    "-S",
+                    ".",
+                    "-B",
+                    "./build",
+                    "-G",
+                    "MinGW Makefiles",
+                    "-DCMAKE_BUILD_TYPE=Debug"
+                ]
+            },
+            "linux": {
+                "command": "cmake",
+                "args": [
+                    "-S",
+                    ".",
+                    "-B",
+                    "./build",
+                    "-G",
+                    "Unix Makefiles",
+                    "-DCMAKE_BUILD_TYPE=Debug"
+                ]
+            },
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "Update new source files"
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "windows": {
+                "command": "mingw32-make",
+                "args": [
+                    "-C",
+                    "./build"
+                ]
+            },
+            "linux": {
+                "command": "make",
+                "args": [
+                    "-C",
+                    "./build"
+                ]
+            },
+            "group": "build",
+            "problemMatcher": ["$gcc"],
+            "detail": "Build with MinGW on Windows or gcc on Linux"
+        },
+        {
+            "label": "build all",
+            "dependsOn": ["delete build", "Cmake configure", "build"],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "re-build",
+            "dependsOn": ["delete build", "build"],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}
