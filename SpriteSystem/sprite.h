@@ -96,7 +96,7 @@ void UpdateSprite(Sprite *sprite, f32 delta_time) {
 
 rectf GetAnimationFrame(AnimationSet *animation_set) {
     const Frames *frame = animation_set->frames[animation_set->animation_index];
-    const vec2 pos = frame->data[animation_set->animation_index];
+    const vec2 pos = frame->data[animation_set->image_index];
     const vec2 size = frame->size;
     const rectf result = {pos.x, pos.y, size.x, size.y};
     return result;
