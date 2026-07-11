@@ -35,16 +35,16 @@ void DrawSpriteRaylib(SpriteRaylib *raylib_sprite) {
 }
 
 void DrawSprite(Sprite *sprite, Texture2D *texture, Color tint) {
-    rectf target_rect;
     rectf source_rect;
+    rectf target_rect;
     GetSpriteFrame(sprite, &source_rect, &target_rect);
-    target_rect.x = sprite->offset.x;
-    target_rect.y = sprite->offset.y;
+    target_rect.x += sprite->offset.x;
+    target_rect.y += sprite->offset.y;
 
     vec2 origin = {sprite->origin.x * abs(sprite->scale.x), sprite->origin.y * abs(sprite->scale.y)};
 
     if (sprite->scale.x < 0.f) {
-        source_rect.w += -1;
+        source_rect.w *= -1;
     }
 
     if (sprite->scale.y < 0.f) {
