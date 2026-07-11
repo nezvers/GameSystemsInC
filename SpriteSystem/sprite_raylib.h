@@ -25,8 +25,6 @@ void DrawSprite(Sprite *sprite, Texture2D *texture, Color tint);
 #endif // SPRITE_RAYLIB_H
 
 
-#define SPRITE_RAYLIB_IMPLEMENTATION
-
 #ifdef SPRITE_RAYLIB_IMPLEMENTATION
 #undef SPRITE_RAYLIB_IMPLEMENTATION
 
